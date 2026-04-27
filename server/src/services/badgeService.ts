@@ -1,0 +1,52 @@
+import { IUser } from '../models/User';
+import { Badge, UserBadge } from '../models/Badge';
+
+/**
+ * badgeService
+ *
+ * After every answered scenario, check whether the user has crossed the
+ * threshold for any badge they don't already own.
+ *
+ * Returns an array of newly awarded badge documents.
+ */
+export const checkAndAwardBadges = async (user: IUser): Promise<unknown[]> => {
+  // Fetch all badge definitions
+  const allBadges = await Badge.find();
+
+  // Fetch badge ids the user already owns
+  const existingUserBadges = await UserBadge.find({ userId: user._id }).select('badgeId');
+  const earnedIds = new Set(existingUserBadges.map((ub) => String(ub.badgeId)));
+
+  const newlyAwarded: unknown[] = [];
+
+  for (const badge of allBadges) {
+    if (earnedIds.has(String(badge._id))) continue; // already earned
+
+    let qualifies = false;
+
+    switch (badge.conditionType) {
+      case 'awareness':
+        qualifies = user.awarenessScore >= badge.requiredScore;
+        break;
+      case 'security':
+        qualifies = user.securityScore >= badge.requiredScore;
+        break;
+      case 'savings':
+        qualifies = user.savingsProgress >= badge.requiredScore;
+        break;
+      case 'scenarios_completed':
+        qualifies = user.completedScenarios.length >= badge.requiredScore;
+        break;
+      case 'balance':
+        qualifies = user.balance >= badge.requiredScore;
+        break;
+    }
+
+    if (qualifies) {
+      await UserBadge.create({ userId: user._id, badgeId: badge._id });
+      newlyAwarded.push(badge);
+    }
+  }
+
+  return newlyAwarded;
+};
