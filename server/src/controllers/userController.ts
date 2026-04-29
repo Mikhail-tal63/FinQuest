@@ -16,6 +16,16 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
+// GET /api/users
+export const getUsers = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await User.find({}, 'name role balance xp riskLevel awarenessScore securityScore');
+    res.json({ success: true, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error', error });
+  }
+};
+
 // GET /api/users/:id
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   try {
