@@ -1,13 +1,13 @@
 {
-  "name": "finquist-server",
+  "name": "finquest-server",
   "version": "1.0.0",
-  "description": "Finquist backend API – financial literacy simulation",
-  "main": "dist/server.js",
+  "description": "FinQuest backend – financial simulation API",
+  "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "seed": "ts-node src/seed/index.ts"
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "seed": "node seed/seed.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -16,10 +16,6 @@
     "mongoose": "^8.4.1"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.14.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.5"
+    "nodemon": "^3.1.4"
   }
 }
