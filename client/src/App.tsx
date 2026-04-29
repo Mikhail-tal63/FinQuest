@@ -4,6 +4,7 @@ import MacTopBar from './components/MacTopBar'
 import SidebarDock from './components/SidebarDock'
 import DashboardView from './views/DashboardView'
 import WalletView from './views/WalletView'
+import ProfileView from './views/ProfileView'
 
 export type Section = 'dashboard' | 'inbox' | 'wallet' | 'bills' | 'tasks' | 'notifications' | 'profile'
 
@@ -13,6 +14,7 @@ function App() {
   const renderView = () => {
     switch (activeSection) {
       case 'wallet': return <WalletView />
+      case 'profile': return <ProfileView />
       case 'dashboard': return <DashboardView />
       default: return <DashboardView />
     }
