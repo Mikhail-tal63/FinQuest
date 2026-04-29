@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
 import { generateReport } from '../services/reportService';
 
-// ─────────────────────────────────────────────
 // GET /api/report/:userId
-// ─────────────────────────────────────────────
 export const getReport = async (req: Request, res: Response): Promise<void> => {
   try {
     const report = await generateReport(req.params.userId);

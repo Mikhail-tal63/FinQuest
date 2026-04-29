@@ -1,75 +1,43 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-// ─────────────────────────────────────────────
-// Interface
-// ─────────────────────────────────────────────
 export interface IAttempt extends Document {
   userId: mongoose.Types.ObjectId;
   scenarioId: mongoose.Types.ObjectId;
   selectedChoiceIndex: number;
-  isCorrect: boolean;
+  qualityLevel: 'best' | 'average' | 'worst';
+  // Reason Behind Decision
+  selectedReasonIndex: number;
+  reasonIsCorrect: boolean;
+  // Applied effects
   balanceEffect: number;
   awarenessEffect: number;
   securityEffect: number;
   savingsEffect: number;
+  riskLevelEffect: number;
+  xpGained: number;
   feedback: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// ─────────────────────────────────────────────
-// Schema
-// ─────────────────────────────────────────────
 const AttemptSchema = new Schema<IAttempt>(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: [true, 'userId is required'],
-    },
-    scenarioId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Scenario',
-      required: [true, 'scenarioId is required'],
-    },
-    selectedChoiceIndex: {
-      type: Number,
-      required: [true, 'selectedChoiceIndex is required'],
-      min: 0,
-    },
-    isCorrect: {
-      type: Boolean,
-      required: true,
-    },
-    balanceEffect: {
-      type: Number,
-      default: 0,
-    },
-    awarenessEffect: {
-      type: Number,
-      default: 0,
-    },
-    securityEffect: {
-      type: Number,
-      default: 0,
-    },
-    savingsEffect: {
-      type: Number,
-      default: 0,
-    },
-    feedback: {
-      type: String,
-      required: true,
-    },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    scenarioId: { type: Schema.Types.ObjectId, ref: 'Scenario', required: true },
+    selectedChoiceIndex: { type: Number, required: true, min: 0 },
+    qualityLevel: { type: String, enum: ['best', 'average', 'worst'], required: true },
+    selectedReasonIndex: { type: Number, default: -1 },
+    reasonIsCorrect: { type: Boolean, default: false },
+    balanceEffect: { type: Number, default: 0 },
+    awarenessEffect: { type: Number, default: 0 },
+    securityEffect: { type: Number, default: 0 },
+    savingsEffect: { type: Number, default: 0 },
+    riskLevelEffect: { type: Number, default: 0 },
+    xpGained: { type: Number, default: 0 },
+    feedback: { type: String, required: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// ─────────────────────────────────────────────
-// Model
-// ─────────────────────────────────────────────
 const Attempt: Model<IAttempt> = mongoose.model<IAttempt>('Attempt', AttemptSchema);
-
 export default Attempt;

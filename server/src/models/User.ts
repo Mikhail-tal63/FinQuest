@@ -1,8 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-// ─────────────────────────────────────────────
-// Interface
-// ─────────────────────────────────────────────
 export interface IUser extends Document {
   name: string;
   role: 'student' | 'employee' | 'freelancer';
@@ -10,14 +7,15 @@ export interface IUser extends Document {
   awarenessScore: number;
   securityScore: number;
   savingsProgress: number;
+  riskLevel: number;            // 0-100: how exposed the user currently is
+  xp: number;                   // experience points gained per correct decision
+  decisionQualityScore: number; // 0-100: tracks quality of reasoning
+  mistakeTags: string[];        // e.g. ['phishing', 'impulse_spending']
   completedScenarios: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
 
-// ─────────────────────────────────────────────
-// Schema
-// ─────────────────────────────────────────────
 const UserSchema = new Schema<IUser>(
   {
     name: {
@@ -30,42 +28,18 @@ const UserSchema = new Schema<IUser>(
       enum: ['student', 'employee', 'freelancer'],
       required: [true, 'Role is required'],
     },
-    balance: {
-      type: Number,
-      default: 1000,
-    },
-    awarenessScore: {
-      type: Number,
-      default: 50,
-      min: 0,
-      max: 100,
-    },
-    securityScore: {
-      type: Number,
-      default: 50,
-      min: 0,
-      max: 100,
-    },
-    savingsProgress: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-    completedScenarios: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Scenario',
-      },
-    ],
+    balance: { type: Number, default: 1000 },
+    awarenessScore: { type: Number, default: 50, min: 0, max: 100 },
+    securityScore: { type: Number, default: 50, min: 0, max: 100 },
+    savingsProgress: { type: Number, default: 0, min: 0 },
+    riskLevel: { type: Number, default: 0, min: 0, max: 100 },
+    xp: { type: Number, default: 0, min: 0 },
+    decisionQualityScore: { type: Number, default: 50, min: 0, max: 100 },
+    mistakeTags: [{ type: String }],
+    completedScenarios: [{ type: Schema.Types.ObjectId, ref: 'Scenario' }],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// ─────────────────────────────────────────────
-// Model
-// ─────────────────────────────────────────────
 const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema);
-
 export default User;

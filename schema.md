@@ -3,10 +3,8 @@ erDiagram
     USER ||--o{ ATTEMPT : makes
     USER ||--o{ TRANSACTION : owns
     USER ||--o{ BILL : has
-    USER ||--o{ USER_BADGE : earns
 
     SCENARIO ||--o{ ATTEMPT : answered_in
-    BADGE ||--o{ USER_BADGE : assigned_to
 
     USER {
         ObjectId _id
@@ -16,6 +14,8 @@ erDiagram
         Number awarenessScore
         Number securityScore
         Number savingsProgress
+        Number xp
+        Number level
         Array completedScenarios
         Date createdAt
         Date updatedAt
@@ -44,6 +44,7 @@ erDiagram
         Number awarenessEffect
         Number securityEffect
         Number savingsEffect
+        Number xpEarned
         String feedback
         Date createdAt
         Date updatedAt
@@ -72,22 +73,4 @@ erDiagram
         ObjectId linkedScenarioId
         Date createdAt
         Date updatedAt
-    }
-
-    BADGE {
-        ObjectId _id
-        String name
-        String description
-        String icon
-        String conditionType
-        Number requiredScore
-        Date createdAt
-        Date updatedAt
-    }
-
-    USER_BADGE {
-        ObjectId _id
-        ObjectId userId
-        ObjectId badgeId
-        Date earnedAt
     }
