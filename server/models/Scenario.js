@@ -48,10 +48,11 @@ const scenarioSchema = new mongoose.Schema(
         'tax_refund',
         'account_verification',
         'prize_notification',
+        'income_budgeting',
       ],
       required: true,
     },
-    source: { type: String, enum: ['inbox', 'sms', 'notification'], default: 'inbox' },
+    source: { type: String, enum: ['inbox', 'sms', 'notification', 'wallet'], default: 'inbox' },
     emailMeta: {
       sender: { type: String },
       subject: { type: String },

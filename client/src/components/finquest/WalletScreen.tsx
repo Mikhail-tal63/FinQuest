@@ -1,6 +1,9 @@
-import { TrendingDown, Landmark, ShoppingCart, Coffee, Smartphone } from "lucide-react";
+import { useState } from "react";
+import { TrendingDown, Landmark, ShoppingCart, Coffee, Smartphone, PiggyBank } from "lucide-react";
 import { useFinQuest } from "@/context/FinQuestContext";
 import { useEffect } from "react";
+import { api, AnswerResult } from "@/lib/api";
+import { ResultModal } from "./ResultModal";
 
 const transactions = [
   { name: "Whole Foods Market", meta: "Today, 2:45 PM • Groceries", amount: -142.8, Icon: ShoppingCart },
@@ -9,19 +12,81 @@ const transactions = [
 ];
 
 export function WalletScreen() {
-  const { user, refreshUser } = useFinQuest();
+  const { user, refreshUser, currentScenario, sessionId, loadCurrentScenario, setCurrentScenario, setActiveWindow, setRemainingScenarios } =
+    useFinQuest();
+  const [result, setResult] = useState<AnswerResult | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
     refreshUser();
   }, [refreshUser]);
 
+  const handleAnswer = async (choiceIndex: number) => {
+    if (!sessionId || submitting) return;
+    setSubmitting(true);
+    try {
+      const r = await api.answer(sessionId, choiceIndex);
+      setResult(r);
+      setRemainingScenarios(r.remainingScenarios);
+      await refreshUser();
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleContinue = async () => {
+    setResult(null);
+    const next = await loadCurrentScenario();
+    if (!next) {
+      setCurrentScenario(null);
+      setActiveWindow("final");
+    } else if (next.source !== "wallet") {
+      setActiveWindow("inbox");
+    }
+  };
+
   if (!user) return null;
   const balance = user.balance;
   const credit = 25000 - balance;
+  const hasChallenge = currentScenario?.source === "wallet";
 
   return (
     <div className="p-10 max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold tracking-tight">Wallet</h1>
       <p className="mt-2 text-muted-foreground">Manage your cards and view spending insights.</p>
+
+      {/* Budget Challenge Banner */}
+      {hasChallenge && (
+        <div className="mt-6 rounded-2xl border border-orange-300 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-800 p-6">
+          <div className="flex items-center gap-3 mb-1">
+            <PiggyBank className="w-6 h-6 text-orange-500" />
+            <h2 className="text-lg font-bold text-orange-700 dark:text-orange-400">Budgeting Challenge</h2>
+          </div>
+          <p className="text-sm text-orange-600 dark:text-orange-300 mb-1 font-medium">{currentScenario.subject}</p>
+          <p className="text-sm text-foreground/80 leading-relaxed mb-6">{currentScenario.description}</p>
+
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
+            How do you allocate your income?
+          </h4>
+          <div className="space-y-2">
+            {currentScenario.choices.map((c) => (
+              <button
+                key={c.index}
+                disabled={submitting}
+                onClick={() => handleAnswer(c.index)}
+                className="w-full text-left p-4 rounded-xl border border-orange-200 dark:border-orange-800 bg-white dark:bg-card hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/50 transition-smooth disabled:opacity-50 group"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs flex items-center justify-center font-semibold group-hover:bg-orange-400 group-hover:text-white transition-smooth">
+                    {String.fromCharCode(65 + c.index)}
+                  </span>
+                  <span className="text-sm">{c.label}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Visa card */}
@@ -112,6 +177,8 @@ export function WalletScreen() {
           </div>
         ))}
       </div>
+
+      {result && <ResultModal result={result} onContinue={handleContinue} />}
     </div>
   );
 }

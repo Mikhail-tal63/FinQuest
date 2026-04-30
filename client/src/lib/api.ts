@@ -33,6 +33,8 @@ export interface Choice {
 
 export interface Scenario {
   id: string;
+  source: string;
+  title: string;
   sender: string;
   subject: string;
   preview?: string;
@@ -73,6 +75,7 @@ interface BackendScenario {
   _id: string;
   title: string;
   description: string;
+  source: string;
   emailMeta: { sender: string; subject: string; preview?: string; riskBadge?: string } | null;
   choices: Array<{ text: string; qualityLevel: string; feedback: string }>;
 }
@@ -122,6 +125,8 @@ function mapUser(u: BackendUser): User {
 function mapScenario(s: BackendScenario): Scenario {
   return {
     id: s._id,
+    source: s.source ?? "inbox",
+    title: s.title,
     sender: s.emailMeta?.sender ?? "Unknown Sender",
     subject: s.emailMeta?.subject ?? s.title,
     preview: s.emailMeta?.preview,

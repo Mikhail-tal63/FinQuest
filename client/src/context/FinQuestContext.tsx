@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import { api, User, Scenario, Persona, resetMockProgress } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export type WindowKey = "persona" | "inbox" | "wallet" | "profile" | "final";
 
@@ -27,6 +28,7 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
   const [activeWindow, setActiveWindow] = useState<WindowKey>("persona");
   const [loading, setLoading] = useState(false);
   const [remainingScenarios, setRemainingScenarios] = useState(0);
+  const { toast } = useToast();
 
   const selectPersona = useCallback(async (persona: Persona) => {
     setLoading(true);
@@ -39,10 +41,16 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
       const sc = await api.getCurrentScenario(s.sessionId);
       setCurrentScenario(sc);
       setActiveWindow("inbox");
+    } catch (err) {
+      toast({
+        title: "Failed to start session",
+        description: err instanceof Error ? err.message : "Could not connect to server. Make sure the backend is running.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   const refreshUser = useCallback(async () => {
     if (!user) return;

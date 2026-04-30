@@ -398,6 +398,63 @@ const scenarios = [
       },
     ],
   },
+
+  // ─── INCOME BUDGETING ─────────────────────────────────────────────────────────
+  {
+    title: 'Income Budgeting: Allocate Your Salary',
+    description:
+      'Your monthly salary of $3,000 just landed in your account. You have fixed bills (rent, electricity, internet), daily expenses (food, transport, entertainment), and financial goals you want to save toward. How do you split your income this month?',
+    type: 'income_budgeting',
+    source: 'wallet',
+    emailMeta: {
+      sender: 'Wallet',
+      subject: 'New Income Received: $3,000',
+      preview: 'Your monthly salary has arrived. How will you allocate it?',
+      riskBadge: 'Budgeting',
+    },
+    realContext:
+      'Financial experts recommend the 50/30/20 rule: 50% for needs (bills), 30% for wants (expenses), 20% for savings. This balanced approach builds financial security while still letting you enjoy life.',
+    difficulty: 'easy',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Bills: $1,500 (50%) • Expenses: $900 (30%) • Savings: $600 (20%) — Follow the 50/30/20 rule.',
+        qualityLevel: 'best',
+        feedback:
+          'Excellent! The 50/30/20 rule is the gold standard of personal budgeting. By consistently saving 20%, you build a real financial safety net that protects you from unexpected events.',
+        effects: { xp: 60, securityScore: 0, awarenessScore: 15, balance: 600 },
+        timeline: [
+          { day: 1, event: 'Salary allocated: Bills ✓  Expenses ✓  Savings ✓', isPositive: true },
+          { day: 30, event: 'You saved exactly $600 at month end — just as planned.', isPositive: true },
+          { day: 90, event: 'Savings account hits $1,800 — two months of emergencies covered.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Bills: $2,000 (67%) • Expenses: $1,000 (33%) • Savings: $0 — Pay everything, save nothing.',
+        qualityLevel: 'worst',
+        feedback:
+          'Dangerous. Zero savings means any small emergency can destabilize you financially. Even if bills are high, always carve out at least 10% for savings — it compounds over time.',
+        effects: { xp: 5, securityScore: 0, awarenessScore: -10, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Entire salary spent. No savings buffer created.', isPositive: false },
+          { day: 15, event: 'Your car needs a $400 repair — no funds available.', isPositive: false },
+          { day: 16, event: 'You borrow to cover the emergency, adding financial stress.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Bills: $1,200 (40%) • Expenses: $1,500 (50%) • Savings: $300 (10%) — Light savings, heavier spending.',
+        qualityLevel: 'average',
+        feedback:
+          'Better than nothing! But your spending is a bit high. Try to gradually cut discretionary expenses and push savings toward 20% — the long-term difference is significant.',
+        effects: { xp: 30, securityScore: 0, awarenessScore: 8, balance: 300 },
+        timeline: [
+          { day: 1, event: 'Saved $300 — a step in the right direction.', isPositive: true },
+          { day: 30, event: 'Discretionary spending was higher than necessary this month.', isPositive: false },
+          { day: 60, event: 'You review your budget and commit to increasing savings next month.', isPositive: true },
+        ],
+      },
+    ],
+  },
 ]
 
 module.exports = scenarios

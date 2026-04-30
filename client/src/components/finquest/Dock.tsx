@@ -9,15 +9,22 @@ const items: { key: WindowKey; label: string; Icon: typeof Mail; gradient: strin
 ];
 
 export function Dock() {
-  const { activeWindow, setActiveWindow, user, remainingScenarios } = useFinQuest();
+  const { activeWindow, setActiveWindow, user, remainingScenarios, currentScenario } = useFinQuest();
   if (!user) return null;
+
+  const hasWalletChallenge = currentScenario?.source === "wallet";
 
   return (
     <aside className="absolute left-4 top-1/2 -translate-y-1/2 z-20">
       <div className="flex flex-col gap-3 p-3 rounded-3xl bg-white/80 backdrop-blur-xl shadow-dock border border-white">
         {items.map(({ key, label, Icon, gradient }) => {
           const active = activeWindow === key;
-          const badge = key === "inbox" && remainingScenarios > 0 ? remainingScenarios : 0;
+          const badge =
+            key === "inbox" && !hasWalletChallenge && remainingScenarios > 0
+              ? remainingScenarios
+              : key === "wallet" && hasWalletChallenge
+              ? 1
+              : 0;
 
           return (
             <button
