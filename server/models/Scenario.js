@@ -56,6 +56,7 @@ const scenarioSchema = new mongoose.Schema(
       required: true,
     },
     source: { type: String, enum: ['inbox', 'sms', 'notification', 'wallet', 'bills'], default: 'inbox' },
+    scheduledDay: { type: Number, default: 1, min: 1, max: 30 },
     emailMeta: {
       sender: { type: String },
       subject: { type: String },

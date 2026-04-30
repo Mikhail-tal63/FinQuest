@@ -6,6 +6,7 @@ const scenarios = [
       'You receive an email that reads: "Dear Customer, We have detected suspicious activity on your BankSecure account. Your account access has been temporarily suspended. To restore access, click the link below and verify your identity within 24 hours or your account will be permanently closed. Click here: http://banksecure-support.ru/verify"',
     type: 'phishing_bank',
     source: 'inbox',
+    scheduledDay: 3,
     emailMeta: {
       sender: 'noreply@banksecure-support.ru',
       subject: 'URGENT: Account Suspended – Action Required',
@@ -63,6 +64,7 @@ const scenarios = [
       'You receive an email: "Congratulations! You have been selected to receive a $3,500 educational assistance grant from the Ministry of Education. To claim your funds, complete the form at the link below and provide your bank account details for direct deposit. Offer expires in 48 hours."',
     type: 'phishing_grant',
     source: 'inbox',
+    scheduledDay: 8,
     emailMeta: {
       sender: 'grants@ministry-edu-assistance.net',
       subject: 'You\'ve Been Selected: $3,500 Grant Waiting',
@@ -119,6 +121,7 @@ const scenarios = [
       'HR sends a company-wide email: "We are updating our payroll system. All employees must re-submit their bank account information via the secure portal linked below before Friday or your salary payment may be delayed. Please use your employee ID and personal email to log in."',
     type: 'salary_update',
     source: 'inbox',
+    scheduledDay: 14,
     emailMeta: {
       sender: 'hr-payroll@company-hr-portal.co',
       subject: 'Action Required: Update Payroll Details by Friday',
@@ -176,6 +179,7 @@ const scenarios = [
       'An acquaintance DMs you: "I\'ve been using this crypto trading bot for 3 months. Last month I made $6,000 on a $2,000 investment. The window to join this round closes Sunday. The platform is VaultProfitBot.com — I can send you a referral link. No risk, guaranteed returns."',
     type: 'investment_scam',
     source: 'inbox',
+    scheduledDay: 17,
     emailMeta: {
       sender: 'referral@vaultprofitbot.com',
       subject: 'Your friend invited you: Earn 40% monthly — Limited spots',
@@ -234,6 +238,7 @@ const scenarios = [
       'An official-looking email from "National Revenue Service" says: "After reviewing your recent tax return, we have determined that you are owed a refund of $780.00. To process your refund, please verify your identity and provide your bank account information using the secure form below. Refunds not claimed within 5 days will be forfeited."',
     type: 'tax_refund',
     source: 'inbox',
+    scheduledDay: 23,
     emailMeta: {
       sender: 'refunds@national-revenue-service.org',
       subject: 'Tax Refund Notification – $780.00 Available',
@@ -291,6 +296,7 @@ const scenarios = [
       'You get an email from what looks like your freelance platform: "To maintain your account in good standing, we need to re-verify your identity. Please re-enter your PayPal or bank account information linked to your profile. Failure to verify within 72 hours will result in a hold on your pending payments of $1,450."',
     type: 'account_verification',
     source: 'inbox',
+    scheduledDay: 27,
     emailMeta: {
       sender: 'verify@freelancepay-security.com',
       subject: 'Account Verification Required – $1,450 Payment on Hold',
@@ -349,6 +355,7 @@ const scenarios = [
       'A pop-up notification reads: "Congratulations! You are our 1,000,000th visitor and have been selected to win a $500 Amazon Gift Card! Click below, complete a 30-second survey, and provide your shipping address and credit card details (for identity verification only — you will NOT be charged)."',
     type: 'prize_notification',
     source: 'inbox',
+    scheduledDay: 11,
     emailMeta: {
       sender: 'winner@amazongifts-promo.net',
       subject: 'You Won! Claim Your $500 Amazon Gift Card Now',
@@ -406,6 +413,7 @@ const scenarios = [
       'You receive an SMS from an unknown number: "Hi, it\'s [Friend Name]. I\'m stranded and my wallet was stolen. I urgently need you to transfer $300 to this account: 4829-7731-0042. I\'ll pay you back first thing tomorrow. Please hurry — I\'m stuck and really need your help right now!"',
     type: 'urgent_transfer',
     source: 'sms',
+    scheduledDay: 6,
     emailMeta: {
       sender: '+1 (555) 847-2931',
       subject: 'URGENT — Transfer $300 NOW',
@@ -464,6 +472,7 @@ const scenarios = [
       'Your monthly internet bill of $65.00 from FastConnect is due today. You have $420 in your available balance. You\'ve been meaning to buy new headphones this week ($80), and you also have a dinner plan with friends on Friday. The bill reads: "Payment due: Today. Late fee after 3 days: $12.00. Service suspension after 7 days."',
     type: 'internet_bill',
     source: 'bills',
+    scheduledDay: 1,
     emailMeta: {
       sender: 'FastConnect Internet',
       subject: 'Bill Due Today: $65.00 — Internet Service',
@@ -524,6 +533,7 @@ const scenarios = [
       '⚡ FLASH SALE — 40% OFF! Samsung Galaxy Tab S9 Ultra: $389 (was $649). Only 4 units left in stock! Deal expires in 2 hours. Your friends already grabbed theirs. Tap now before it\'s gone forever!',
     type: 'tempting_purchase',
     source: 'notification',
+    scheduledDay: 20,
     emailMeta: {
       sender: 'ShopNow App',
       subject: 'Flash Sale: 40% Off Galaxy Tab S9 — 2 Hours Only',
@@ -582,6 +592,7 @@ const scenarios = [
       'Your monthly salary of $3,000 just landed in your account. You have fixed bills (rent, electricity, internet), daily expenses (food, transport, entertainment), and financial goals you want to save toward. How do you split your income this month?',
     type: 'income_budgeting',
     source: 'wallet',
+    scheduledDay: 2,
     emailMeta: {
       sender: 'Wallet',
       subject: 'New Income Received: $3,000',

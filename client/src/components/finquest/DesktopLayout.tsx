@@ -8,6 +8,7 @@ import { NotificationsScreen } from "./NotificationsScreen";
 import { BillsScreen } from "./BillsScreen";
 import { ProfileScreen } from "./ProfileScreen";
 import { FinalReport } from "./FinalReport";
+import { GameClock } from "./GameClock";
 
 export function DesktopLayout() {
   const { activeWindow, user } = useFinQuest();
@@ -15,23 +16,25 @@ export function DesktopLayout() {
   const renderWindow = () => {
     if (!user || activeWindow === "persona") return <PersonaScreen />;
     switch (activeWindow) {
-      case "inbox": return <InboxScreen />;
-      case "wallet": return <WalletScreen />;
+      case "inbox":         return <InboxScreen />;
+      case "wallet":        return <WalletScreen />;
       case "notifications": return <NotificationsScreen />;
-      case "bills": return <BillsScreen />;
-      case "profile": return <ProfileScreen />;
-      case "final": return <FinalReport />;
-      default: return <InboxScreen />;
+      case "bills":         return <BillsScreen />;
+      case "profile":       return <ProfileScreen />;
+      case "final":         return <FinalReport />;
+      default:              return <InboxScreen />;
     }
   };
 
   return (
     <div className="min-h-screen w-full desktop-bg flex flex-col">
-      {/* Menu bar */}
-      <header className="h-8 px-4 flex items-center bg-foreground/90 backdrop-blur text-background text-xs font-medium shrink-0">
-        <span className="font-semibold">FinQuest</span>
-        <span className="mx-3 opacity-50">•</span>
-        <span className="opacity-70">Financial Simulation Platform</span>
+      <header className="h-8 px-4 flex items-center justify-between bg-foreground/90 backdrop-blur text-background text-xs font-medium shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold">FinQuest</span>
+          <span className="opacity-50">•</span>
+          <span className="opacity-70">Financial Simulation Platform</span>
+        </div>
+        <GameClock />
       </header>
 
       <main className="flex-1 relative p-6">

@@ -29,11 +29,14 @@ export interface User {
 export interface Choice {
   index: number;
   label: string;
+  qualityLevel: 'best' | 'average' | 'worst';
 }
 
 export interface Scenario {
   id: string;
+  type: string;
   source: string;
+  scheduledDay: number;
   title: string;
   sender: string;
   subject: string;
@@ -73,11 +76,13 @@ interface BackendUser {
 
 interface BackendScenario {
   _id: string;
+  type: string;
   title: string;
   description: string;
   source: string;
+  scheduledDay?: number;
   emailMeta: { sender: string; subject: string; preview?: string; riskBadge?: string } | null;
-  choices: Array<{ text: string; qualityLevel: string; feedback: string }>;
+  choices: Array<{ text: string; qualityLevel: 'best' | 'average' | 'worst'; feedback: string }>;
 }
 
 interface BackendSession {
@@ -125,14 +130,16 @@ function mapUser(u: BackendUser): User {
 function mapScenario(s: BackendScenario): Scenario {
   return {
     id: s._id,
+    type: s.type,
     source: s.source ?? "inbox",
+    scheduledDay: s.scheduledDay ?? 1,
     title: s.title,
     sender: s.emailMeta?.sender ?? "Unknown Sender",
     subject: s.emailMeta?.subject ?? s.title,
     preview: s.emailMeta?.preview,
     description: s.description,
     receivedAt: "just now",
-    choices: s.choices.map((c, i) => ({ index: i, label: c.text })),
+    choices: s.choices.map((c, i) => ({ index: i, label: c.text, qualityLevel: c.qualityLevel })),
   };
 }
 
@@ -202,12 +209,17 @@ export const api = {
     return s ? mapScenario(s) : null;
   },
 
-  answer: async (sessionId: string, choiceIndex: number): Promise<AnswerResult> => {
+  answer: async (sessionId: string, scenarioId: string, choiceIndex: number): Promise<AnswerResult> => {
     const r = await request<BackendAnswerResult>(`/session/${sessionId}/answer`, {
       method: "POST",
-      body: JSON.stringify({ choiceIndex }),
+      body: JSON.stringify({ scenarioId, choiceIndex }),
     });
     return mapAnswerResult(r);
+  },
+
+  getSessionScenarios: async (sessionId: string): Promise<Scenario[]> => {
+    const list = await request<BackendScenario[]>(`/session/${sessionId}/scenarios`);
+    return list.map(mapScenario);
   },
 
   getResult: async (sessionId: string): Promise<FinalReport> => {
