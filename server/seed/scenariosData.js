@@ -517,6 +517,64 @@ const scenarios = [
   },
 
 
+  // ─── TEMPTING PURCHASE ───────────────────────────────────────────────────────
+  {
+    title: 'Flash Sale: Galaxy Tab S9 — 40% Off Today Only',
+    description:
+      '⚡ FLASH SALE — 40% OFF! Samsung Galaxy Tab S9 Ultra: $389 (was $649). Only 4 units left in stock! Deal expires in 2 hours. Your friends already grabbed theirs. Tap now before it\'s gone forever!',
+    type: 'tempting_purchase',
+    source: 'notification',
+    emailMeta: {
+      sender: 'ShopNow App',
+      subject: 'Flash Sale: 40% Off Galaxy Tab S9 — 2 Hours Only',
+      preview: '40% OFF today only! Galaxy Tab S9 for $389. Only 4 left — deal ends in 2 hours.',
+      riskBadge: 'Impulse Buy',
+    },
+    realContext:
+      '"Limited time," "only X left," and "your friends bought it" are deliberate psychological triggers designed to bypass rational thinking. Flash sales exploit FOMO (fear of missing out) to rush you into unplanned spending.',
+    difficulty: 'medium',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Skip it — this isn\'t in your budget and you don\'t need a tablet right now.',
+        qualityLevel: 'best',
+        feedback:
+          'Excellent impulse control. You recognised the urgency and scarcity tactics for what they are: psychological manipulation. If you genuinely need a tablet, plan it in your next monthly budget.',
+        effects: { xp: 55, securityScore: 0, awarenessScore: 12, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Notification dismissed. $389 stays in your account.', isPositive: true },
+          { day: 3, event: 'The "flash sale" price reappears — it wasn\'t as rare as advertised.', isPositive: true },
+          { day: 30, event: 'You never missed the tablet. Your savings goal stays on track.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Research the price history online first before making any decision.',
+        qualityLevel: 'average',
+        feedback:
+          'Smart move. A quick check on price-tracking tools (like CamelCamelCamel) shows this price appears several times a year — the urgency was manufactured. You decided to wait for a planned purchase.',
+        effects: { xp: 30, securityScore: 0, awarenessScore: 8, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Price history checked — same price ran last month too.', isPositive: true },
+          { day: 1, event: 'You decide to wait. No unplanned spending today.', isPositive: true },
+          { day: 14, event: 'You budget for the tablet next month instead.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Buy it immediately — 40% off is incredible and it\'s running out fast!',
+        qualityLevel: 'worst',
+        feedback:
+          'You fell for the classic FOMO trap. The deal was real, but the urgency was not — similar sales run monthly. Now $389 is gone that you hadn\'t budgeted for, and bills are tighter this month.',
+        effects: { xp: 0, securityScore: 0, awarenessScore: -8, balance: -389 },
+        timeline: [
+          { day: 1, event: '$389 spent on impulse. Excitement is high.', isPositive: false },
+          { day: 5, event: 'Monthly bills arrive. You\'re $389 shorter than expected.', isPositive: false },
+          { day: 7, event: 'You notice the same tablet is on sale again at the same price.', isPositive: false },
+          { day: 30, event: 'Savings goal missed this month because of the unplanned purchase.', isPositive: false },
+        ],
+      },
+    ],
+  },
+
   // ─── INCOME BUDGETING ─────────────────────────────────────────────────────────
   {
     title: 'Income Budgeting: Allocate Your Salary',

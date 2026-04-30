@@ -51,6 +51,7 @@ const scenarioSchema = new mongoose.Schema(
         'income_budgeting',
         'urgent_transfer',
         'internet_bill',
+        'tempting_purchase',
       ],
       required: true,
     },
