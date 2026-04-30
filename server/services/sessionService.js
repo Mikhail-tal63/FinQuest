@@ -15,9 +15,11 @@ async function startSession(userId) {
   const scenarios = await getScenariosByRole(user.role)
   if (!scenarios.length) throw new Error('No scenarios available for this role')
 
-  // Shuffle for variety
-  const shuffled = scenarios.sort(() => Math.random() - 0.5)
-  const scenarioIds = shuffled.map(s => s._id)
+  // Shuffle inbox scenarios for variety, then put wallet scenarios first
+  const walletScenarios = scenarios.filter(s => s.source === 'wallet')
+  const inboxScenarios = scenarios.filter(s => s.source !== 'wallet').sort(() => Math.random() - 0.5)
+  const ordered = [...walletScenarios, ...inboxScenarios]
+  const scenarioIds = ordered.map(s => s._id)
 
   const session = await Session.create({ userId, scenarioIds })
   return session

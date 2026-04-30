@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Inbox as InboxIcon, Archive, Trash2, Wallet } from "lucide-react";
+import { Mail, Inbox as InboxIcon, Archive, Trash2 } from "lucide-react";
 import { useFinQuest } from "@/context/FinQuestContext";
 import { api, AnswerResult } from "@/lib/api";
 import { ResultModal } from "./ResultModal";
@@ -50,23 +50,6 @@ export function InboxScreen() {
     );
   }
 
-  if (currentScenario.source === "wallet") {
-    return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-8">
-        <Wallet className="w-12 h-12 text-orange-400 mb-4" />
-        <h2 className="text-2xl font-semibold">Check Your Wallet</h2>
-        <p className="mt-2 text-muted-foreground max-w-sm">
-          You have a new budgeting challenge waiting in your Wallet. Head over there to allocate your income.
-        </p>
-        <button
-          onClick={() => setActiveWindow("wallet")}
-          className="mt-6 h-10 px-6 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-smooth"
-        >
-          Open Wallet
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="h-full flex">
