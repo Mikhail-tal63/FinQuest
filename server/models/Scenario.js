@@ -49,10 +49,12 @@ const scenarioSchema = new mongoose.Schema(
         'account_verification',
         'prize_notification',
         'income_budgeting',
+        'urgent_transfer',
+        'internet_bill',
       ],
       required: true,
     },
-    source: { type: String, enum: ['inbox', 'sms', 'notification', 'wallet'], default: 'inbox' },
+    source: { type: String, enum: ['inbox', 'sms', 'notification', 'wallet', 'bills'], default: 'inbox' },
     emailMeta: {
       sender: { type: String },
       subject: { type: String },

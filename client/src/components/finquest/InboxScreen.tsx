@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Inbox as InboxIcon, Archive, Trash2 } from "lucide-react";
+import { Mail, Inbox as InboxIcon, Archive, Trash2, MessageSquare, Receipt } from "lucide-react";
 import { useFinQuest } from "@/context/FinQuestContext";
 import { api, AnswerResult } from "@/lib/api";
 import { ResultModal } from "./ResultModal";
@@ -31,7 +31,12 @@ export function InboxScreen() {
     if (!next) {
       setCurrentScenario(null);
       setActiveWindow("final");
+    } else if (next.source === "sms" || next.source === "notification") {
+      setActiveWindow("notifications");
+    } else if (next.source === "bills") {
+      setActiveWindow("bills");
     }
+    // else stay on inbox for inbox/wallet scenarios
   };
 
   if (!currentScenario) {
@@ -50,6 +55,37 @@ export function InboxScreen() {
     );
   }
 
+  if (currentScenario.source === "sms" || currentScenario.source === "notification") {
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-center p-8">
+        <MessageSquare className="w-12 h-12 text-violet-500 mb-4" />
+        <h2 className="text-2xl font-semibold">New Message</h2>
+        <p className="mt-2 text-muted-foreground">You have an urgent notification waiting for you.</p>
+        <button
+          onClick={() => setActiveWindow("notifications")}
+          className="mt-6 h-10 px-6 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-smooth"
+        >
+          View Notification
+        </button>
+      </div>
+    );
+  }
+
+  if (currentScenario.source === "bills") {
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-center p-8">
+        <Receipt className="w-12 h-12 text-green-600 mb-4" />
+        <h2 className="text-2xl font-semibold">Bill Due</h2>
+        <p className="mt-2 text-muted-foreground">You have a bill that needs your attention today.</p>
+        <button
+          onClick={() => setActiveWindow("bills")}
+          className="mt-6 h-10 px-6 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-smooth"
+        >
+          View Bill
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex">

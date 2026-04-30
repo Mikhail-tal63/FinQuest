@@ -399,6 +399,122 @@ const scenarios = [
     ],
   },
 
+  // ─── URGENT MONEY TRANSFER ───────────────────────────────────────────────────
+  {
+    title: 'Urgent Money Transfer Request',
+    description:
+      'You receive an SMS from an unknown number: "Hi, it\'s [Friend Name]. I\'m stranded and my wallet was stolen. I urgently need you to transfer $300 to this account: 4829-7731-0042. I\'ll pay you back first thing tomorrow. Please hurry — I\'m stuck and really need your help right now!"',
+    type: 'urgent_transfer',
+    source: 'sms',
+    emailMeta: {
+      sender: '+1 (555) 847-2931',
+      subject: 'URGENT — Transfer $300 NOW',
+      preview: 'I\'m stranded, wallet stolen. Need $300 transferred immediately.',
+      riskBadge: 'Suspicious Transfer',
+    },
+    realContext:
+      'Urgency is the #1 manipulation tool in financial fraud. Scammers impersonate friends or family to exploit trust and panic. Legitimate emergencies can always wait two minutes for a phone call verification.',
+    difficulty: 'medium',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Call your friend on their known number to verify before doing anything.',
+        qualityLevel: 'best',
+        feedback:
+          'Perfect. You called your friend\'s real number and discovered their phone was never stolen — it was a scam. Urgency was fabricated to stop you from thinking clearly. Two minutes saved you $300.',
+        effects: { xp: 55, securityScore: 12, awarenessScore: 12, balance: 0 },
+        timeline: [
+          { day: 1, event: 'You call your friend. They confirm they are safe and never sent this message.', isPositive: true },
+          { day: 1, event: 'Scam identified. Unknown number blocked and reported.', isPositive: true },
+          { day: 7, event: 'Awareness score rises — you recognised urgency as a manipulation tactic.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Transfer the $300 immediately — it sounds like a real emergency.',
+        qualityLevel: 'worst',
+        feedback:
+          'The account belonged to a scammer. Your friend never knew about this message — their identity was impersonated. Peer-to-peer transfers are almost never reversible once sent.',
+        effects: { xp: 0, securityScore: -20, awarenessScore: -8, balance: -300 },
+        timeline: [
+          { day: 1, event: '$300 transferred to scammer\'s account.', isPositive: false },
+          { day: 1, event: 'You call your friend — they have no idea what you are talking about.', isPositive: false },
+          { day: 2, event: 'Transfer reported to bank. Peer-to-peer transfers rarely recovered.', isPositive: false },
+          { day: 14, event: '$300 permanently lost. Bank unable to reverse the transfer.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Reply to the SMS and ask for a detail only your real friend would know before sending.',
+        qualityLevel: 'average',
+        feedback:
+          'Smart to slow down and verify. But scammers often gather personal details from social media. Calling on a known number is far more reliable than texting back the suspicious number.',
+        effects: { xp: 25, securityScore: 5, awarenessScore: 8, balance: 0 },
+        timeline: [
+          { day: 1, event: 'You ask for verification. Scammer stalls with a vague answer.', isPositive: true },
+          { day: 1, event: 'Suspicious response prompts you to call your friend directly.', isPositive: true },
+          { day: 1, event: 'Friend confirms it is a scam. No money lost.', isPositive: true },
+        ],
+      },
+    ],
+  },
+
+  // ─── INTERNET BILL ───────────────────────────────────────────────────────────
+  {
+    title: 'Internet Bill Due Today — $65.00',
+    description:
+      'Your monthly internet bill of $65.00 from FastConnect is due today. You have $420 in your available balance. You\'ve been meaning to buy new headphones this week ($80), and you also have a dinner plan with friends on Friday. The bill reads: "Payment due: Today. Late fee after 3 days: $12.00. Service suspension after 7 days."',
+    type: 'internet_bill',
+    source: 'bills',
+    emailMeta: {
+      sender: 'FastConnect Internet',
+      subject: 'Bill Due Today: $65.00 — Internet Service',
+      preview: 'Your monthly internet bill of $65 is due today. Pay now to avoid a $12 late fee.',
+      riskBadge: 'Due Today',
+    },
+    realContext:
+      'Recurring bills like internet and utilities should always be paid on time. Late fees add up and missed payments can affect your credit score. The $12 late fee on a $65 bill is an 18% penalty — entirely avoidable.',
+    difficulty: 'easy',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Pay the $65 bill right now — obligations come before discretionary spending.',
+        qualityLevel: 'best',
+        feedback:
+          'Excellent financial discipline. Paying bills on time protects your credit score, avoids late fees, and keeps your services running. The headphones can wait — the bill cannot.',
+        effects: { xp: 50, securityScore: 0, awarenessScore: 12, balance: -65 },
+        timeline: [
+          { day: 1, event: '$65 paid. No late fee. Internet service uninterrupted.', isPositive: true },
+          { day: 3, event: 'You avoided the $12 late fee — that\'s money saved.', isPositive: true },
+          { day: 30, event: 'On-time payment recorded. Credit score unaffected.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Delay it 2 days — you\'ll pay it after the weekend, still within the grace period.',
+        qualityLevel: 'average',
+        feedback:
+          'You technically avoided the late fee this time, but habitual delaying is risky. One forgotten errand or unexpected expense in those 2 days could push you past the deadline.',
+        effects: { xp: 20, securityScore: 0, awarenessScore: 5, balance: -65 },
+        timeline: [
+          { day: 1, event: 'Bill left unpaid. 3-day grace period starts.', isPositive: false },
+          { day: 3, event: 'You remember and pay just before the late fee kicks in.', isPositive: true },
+          { day: 3, event: 'No late fee this time — but it was a close call.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Skip it for now — the headphones and dinner are this week, you\'ll deal with the bill later.',
+        qualityLevel: 'worst',
+        feedback:
+          'Skipping a bill for discretionary spending is a dangerous habit. You paid a $12 late fee, lost internet access for a day, and your account now shows a late payment.',
+        effects: { xp: 0, securityScore: 0, awarenessScore: -8, balance: -77 },
+        timeline: [
+          { day: 1, event: 'Bill ignored. You buy the headphones and enjoy dinner.', isPositive: false },
+          { day: 4, event: '$12 late fee automatically charged to your account.', isPositive: false },
+          { day: 7, event: 'Internet service suspended. You pay $77 to restore it.', isPositive: false },
+          { day: 8, event: 'Service restored — but a late payment is now on your record.', isPositive: false },
+          { day: 30, event: 'Credit report shows one missed payment — takes months to recover.', isPositive: false },
+        ],
+      },
+    ],
+  },
   // ─── INCOME BUDGETING ─────────────────────────────────────────────────────────
   {
     title: 'Income Budgeting: Allocate Your Salary',

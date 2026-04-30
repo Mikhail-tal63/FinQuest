@@ -2,7 +2,7 @@ import { createContext, useContext, useState, ReactNode, useCallback } from "rea
 import { api, User, Scenario, Persona, resetMockProgress } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
-export type WindowKey = "persona" | "inbox" | "wallet" | "profile" | "final";
+export type WindowKey = "persona" | "inbox" | "wallet" | "notifications" | "bills" | "profile" | "final";
 
 interface Ctx {
   user: User | null;

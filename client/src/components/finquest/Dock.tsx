@@ -1,11 +1,13 @@
-import { Mail, Wallet, User } from "lucide-react";
+import { Mail, Wallet, User, MessageSquare, Receipt } from "lucide-react";
 import { useFinQuest, WindowKey } from "@/context/FinQuestContext";
 import { cn } from "@/lib/utils";
 
 const items: { key: WindowKey; label: string; Icon: typeof Mail; gradient: string }[] = [
-  { key: "inbox",   label: "Inbox",   Icon: Mail,   gradient: "dock-blue"   },
-  { key: "wallet",  label: "Wallet",  Icon: Wallet, gradient: "dock-orange" },
-  { key: "profile", label: "Profile", Icon: User,   gradient: "dock-sky"    },
+  { key: "inbox",         label: "Inbox",         Icon: Mail,          gradient: "dock-blue"   },
+  { key: "notifications", label: "Notifications",  Icon: MessageSquare, gradient: "dock-violet" },
+  { key: "bills",         label: "Bills",          Icon: Receipt,       gradient: "dock-green"  },
+  { key: "wallet",        label: "Wallet",         Icon: Wallet,        gradient: "dock-orange" },
+  { key: "profile",       label: "Profile",        Icon: User,          gradient: "dock-sky"    },
 ];
 
 export function Dock() {
@@ -13,6 +15,8 @@ export function Dock() {
   if (!user) return null;
 
   const hasWalletChallenge = currentScenario?.source === "wallet";
+  const hasSmsScenario = currentScenario?.source === "sms" || currentScenario?.source === "notification";
+  const hasBillScenario = currentScenario?.source === "bills";
 
   return (
     <aside className="absolute left-4 top-1/2 -translate-y-1/2 z-20">
@@ -20,9 +24,13 @@ export function Dock() {
         {items.map(({ key, label, Icon, gradient }) => {
           const active = activeWindow === key;
           const badge =
-            key === "inbox" && !hasWalletChallenge && remainingScenarios > 0
+            key === "inbox" && !hasWalletChallenge && !hasSmsScenario && !hasBillScenario && remainingScenarios > 0
               ? remainingScenarios
               : key === "wallet" && hasWalletChallenge
+              ? 1
+              : key === "notifications" && hasSmsScenario
+              ? 1
+              : key === "bills" && hasBillScenario
               ? 1
               : 0;
 
