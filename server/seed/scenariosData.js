@@ -515,6 +515,8 @@ const scenarios = [
       },
     ],
   },
+
+
   // ─── INCOME BUDGETING ─────────────────────────────────────────────────────────
   {
     title: 'Income Budgeting: Allocate Your Salary',

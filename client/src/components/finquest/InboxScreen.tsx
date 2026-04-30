@@ -87,6 +87,8 @@ export function InboxScreen() {
     );
   }
 
+
+
   return (
     <div className="h-full flex">
       {/* List pane */}
