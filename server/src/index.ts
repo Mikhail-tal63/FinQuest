@@ -10,6 +10,7 @@ import sessionRoutes from './routes/sessionRoutes'
 const app = express()
 const PORT = process.env.PORT ?? 5020
 const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/finquest'
+const HOST = process.env.HOST ?? '0.0.0.0'
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors())
@@ -40,13 +41,19 @@ app.use((err: Error & { status?: number }, _req: Request, res: Response, _next: 
 })
 
 // ── Database + Server startup ─────────────────────────────────────────────────
+const startServer = () => {
+  app.listen(Number(PORT), HOST, () => {
+    console.log(`FinQuest API listening on http://${HOST}:${PORT}`)
+  })
+}
+
 mongoose
   .connect(MONGO_URI)
   .then(() => {
-    console.log('MongoDB connected:', MONGO_URI)
-    app.listen(PORT, () => console.log(`FinQuest API running on http://localhost:${PORT}`))
+    console.log('MongoDB connected')
+    startServer()
   })
   .catch((err: Error) => {
     console.error('MongoDB connection error:', err.message)
-    process.exit(1)
+    startServer()
   })
