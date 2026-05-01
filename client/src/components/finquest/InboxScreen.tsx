@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Mail, Inbox as InboxIcon, ShieldAlert, CheckCheck, ExternalLink, MessageSquare, Receipt, Clock } from "lucide-react";
+import { Mail, Inbox as InboxIcon, ShieldAlert, CheckCheck, ExternalLink, Clock, Banknote } from "lucide-react";
 import { useFinQuest } from "@/context/FinQuestContext";
 import { AnswerResult, Scenario } from "@/lib/api";
 import { ResultModal } from "./ResultModal";
@@ -16,29 +16,34 @@ const LINK_LABELS: Record<string, string> = {
   prize_notification:   "Complete Survey & Claim Prize →",
 };
 
-export function InboxScreen() {
-  const { allScenarios, answeredIds, gameDay, answerScenario, setActiveWindow } = useFinQuest();
+const SALARY_ID   = "__salary_deposit__";
+const SALARY_ID_2 = "__salary_deposit_2__";
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export function InboxScreen() {
+  const { allScenarios, answeredIds, gameDay, answerScenario, salary, user } = useFinQuest();
+
+  const [selectedId, setSelectedId] = useState<string>(SALARY_ID);
   const [result, setResult]         = useState<AnswerResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formOpen, setFormOpen]     = useState(false);
 
-  // All inbox-type scenarios revealed so far, sorted by scheduledDay
+  // All inbox scenarios revealed so far
   const inboxScenarios = allScenarios
-    .filter(s => (s.source === "inbox" || s.source === "wallet") && s.scheduledDay <= gameDay)
+    .filter(s => s.source === "inbox" && s.scheduledDay <= gameDay)
     .sort((a, b) => a.scheduledDay - b.scheduledDay);
 
-  // First unanswered revealed inbox scenario
+  // First unanswered revealed scenario
   const activeScenario: Scenario | null =
     inboxScenarios.find(s => !answeredIds.has(s.id)) ?? null;
 
-  // Auto-select the active scenario when it changes
+  // Auto-select the active scenario when it first appears; otherwise keep salary email selected
   useEffect(() => {
     if (activeScenario) setSelectedId(activeScenario.id);
   }, [activeScenario?.id]);
 
-  const viewedScenario = inboxScenarios.find(s => s.id === selectedId) ?? activeScenario;
+  const viewedScenario  = inboxScenarios.find(s => s.id === selectedId) ?? null;
+  const viewingSalary   = selectedId === SALARY_ID;
+  const viewingSalary2  = selectedId === SALARY_ID_2;
 
   const handleAnswer = async (choiceIndex: number) => {
     if (!viewedScenario || submitting) return;
@@ -64,20 +69,7 @@ export function InboxScreen() {
 
   const isCurrentViewed = viewedScenario?.id === activeScenario?.id;
   const isAnswered      = viewedScenario ? answeredIds.has(viewedScenario.id) : false;
-  const isInboxSource   = viewedScenario?.source === "inbox";
   const linkLabel       = viewedScenario ? LINK_LABELS[viewedScenario.type] : null;
-
-  // ── Empty state ──────────────────────────────────────────────────────────
-
-  if (inboxScenarios.length === 0) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-8">
-        <InboxIcon className="w-12 h-12 text-muted-foreground mb-4" />
-        <h2 className="text-2xl font-semibold">Inbox is empty</h2>
-        <p className="mt-2 text-muted-foreground">No emails yet — check back as the month progresses.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="h-full flex">
@@ -92,10 +84,51 @@ export function InboxScreen() {
         </div>
 
         <div className="px-3 space-y-1 overflow-auto flex-1">
+          {/* Month 1 salary — always shown */}
+          <button
+            onClick={() => setSelectedId(SALARY_ID)}
+            className={cn(
+              "w-full text-left p-3 rounded-xl transition-smooth border",
+              viewingSalary ? "bg-card border-border shadow-sm" : "border-transparent hover:bg-muted/50"
+            )}
+          >
+            <div className="flex justify-between items-start gap-2">
+              <span className="text-sm font-normal text-muted-foreground truncate">FinQuest Payroll</span>
+              <span className="text-[10px] text-muted-foreground shrink-0 flex items-center gap-1">
+                <Clock className="w-2.5 h-2.5" /> Day 1
+              </span>
+            </div>
+            <div className="text-xs text-muted-foreground mt-1 truncate">
+              April Salary — ${salary.toLocaleString()}
+            </div>
+          </button>
+
+          {/* Month 2 salary — appears on day 31 */}
+          {gameDay >= 31 && (
+            <button
+              onClick={() => setSelectedId(SALARY_ID_2)}
+              className={cn(
+                "w-full text-left p-3 rounded-xl transition-smooth border",
+                viewingSalary2 ? "bg-card border-border shadow-sm" : "border-transparent hover:bg-muted/50"
+              )}
+            >
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-sm font-normal text-muted-foreground truncate">FinQuest Payroll</span>
+                <span className="text-[10px] text-muted-foreground shrink-0 flex items-center gap-1">
+                  <Clock className="w-2.5 h-2.5" /> Day 31
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 truncate">
+                May Salary — ${salary.toLocaleString()}
+              </div>
+            </button>
+          )}
+
+          {/* Scenario emails */}
           {inboxScenarios.map(scenario => {
-            const isSelected  = selectedId === scenario.id;
-            const isRead      = answeredIds.has(scenario.id);
-            const isActive    = scenario.id === activeScenario?.id;
+            const isSelected = selectedId === scenario.id;
+            const isRead     = answeredIds.has(scenario.id);
+            const isActive   = scenario.id === activeScenario?.id;
             return (
               <button
                 key={scenario.id}
@@ -122,29 +155,14 @@ export function InboxScreen() {
             );
           })}
 
-          {/* Unrevealed previews */}
-          {allScenarios
-            .filter(s => (s.source === "inbox" || s.source === "wallet") && s.scheduledDay > gameDay)
-            .map(s => (
-              <div key={s.id} className="p-3 rounded-xl border border-dashed border-border/40 opacity-40">
-                <div className="flex justify-between items-start gap-2">
-                  <span className="text-sm text-muted-foreground">···</span>
-                  <span className="text-[10px] text-muted-foreground shrink-0 flex items-center gap-1">
-                    <Clock className="w-2.5 h-2.5" />
-                    Day {s.scheduledDay}
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">Arrives on Day {s.scheduledDay}</div>
-              </div>
-            ))}
         </div>
       </aside>
 
       {/* ── Message view ─────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col">
         {/* Toolbar */}
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-border/50 shrink-0">
-          {isCurrentViewed && isInboxSource && !isAnswered ? (
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-border/50 shrink-0 min-h-[48px]">
+          {!viewingSalary && !viewingSalary2 && isCurrentViewed && !isAnswered ? (
             <>
               <button
                 onClick={handleReport}
@@ -163,17 +181,91 @@ export function InboxScreen() {
                 Ignore Email
               </button>
             </>
-          ) : null}
-          {isAnswered && (
+          ) : !viewingSalary && !viewingSalary2 && isAnswered ? (
             <span className="text-xs text-muted-foreground italic flex items-center gap-1.5">
               <CheckCheck className="w-3.5 h-3.5 text-green-500" />
               Handled
             </span>
-          )}
+          ) : null}
         </div>
 
         <div className="p-6 flex-1 overflow-auto">
-          {viewedScenario ? (
+          {viewingSalary ? (
+            /* ── Month 1 salary email ── */
+            <>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+                  <Banknote className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-baseline">
+                    <h3 className="font-semibold">FinQuest Payroll</h3>
+                    <span className="text-xs text-muted-foreground">Day 1</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">April Salary — ${salary.toLocaleString()}</p>
+                </div>
+              </div>
+              <div className="mt-6 text-sm leading-relaxed text-foreground max-w-2xl space-y-4">
+                <p>Hi <span className="font-medium capitalize">{user?.persona}</span>,</p>
+                <p>
+                  Your monthly salary of{" "}
+                  <span className="font-semibold text-emerald-600">${salary.toLocaleString()}</span> has been
+                  deposited for April 2026.
+                </p>
+                <p>
+                  Your recurring bills and active subscriptions will be deducted from this amount. Use the{" "}
+                  <span className="font-medium">Bills</span> screen to manage your expenses — you can cancel
+                  optional subscriptions at any time.
+                </p>
+                <p>Stay alert for suspicious emails. Any financial loss from scams comes directly out of your balance.</p>
+                <p className="text-muted-foreground">Good luck — your goal is to finish two months without going into debt.</p>
+              </div>
+              <div className="mt-8 max-w-2xl rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 px-5 py-4 flex items-center gap-4">
+                <Banknote className="w-6 h-6 text-emerald-600 shrink-0" />
+                <div>
+                  <div className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold uppercase tracking-wide">April Deposit</div>
+                  <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">+${salary.toLocaleString()}</div>
+                </div>
+              </div>
+            </>
+          ) : viewingSalary2 ? (
+            /* ── Month 2 salary email ── */
+            <>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+                  <Banknote className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-baseline">
+                    <h3 className="font-semibold">FinQuest Payroll</h3>
+                    <span className="text-xs text-muted-foreground">Day 31</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">May Salary — ${salary.toLocaleString()}</p>
+                </div>
+              </div>
+              <div className="mt-6 text-sm leading-relaxed text-foreground max-w-2xl space-y-4">
+                <p>Hi <span className="font-medium capitalize">{user?.persona}</span>,</p>
+                <p>
+                  Your May salary of{" "}
+                  <span className="font-semibold text-emerald-600">${salary.toLocaleString()}</span> has been
+                  deposited. You are now in month two of your financial simulation.
+                </p>
+                <p>
+                  Your bills have reset for this month — all active subscriptions will be deducted again. Scammers
+                  are still out there, so stay sharp.
+                </p>
+                <p className="text-muted-foreground">One month down. Finish strong.</p>
+              </div>
+              <div className="mt-8 max-w-2xl rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 px-5 py-4 flex items-center gap-4">
+                <Banknote className="w-6 h-6 text-emerald-600 shrink-0" />
+                <div>
+                  <div className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold uppercase tracking-wide">May Deposit</div>
+                  <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">+${salary.toLocaleString()}</div>
+                </div>
+              </div>
+            </>
+          ) : viewedScenario ? (
+            /* ── Normal scenario email ── */
             <>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
@@ -192,8 +284,8 @@ export function InboxScreen() {
                 {viewedScenario.description}
               </div>
 
-              {/* Phishing link — inbox source only, active and unanswered */}
-              {isInboxSource && linkLabel && !isAnswered && (
+              {/* Phishing link — active and unanswered */}
+              {linkLabel && !isAnswered && (
                 <div className="mt-6 max-w-2xl">
                   <button
                     onClick={() => isCurrentViewed && setFormOpen(true)}
@@ -210,47 +302,6 @@ export function InboxScreen() {
                   </button>
                 </div>
               )}
-
-              {/* Choice buttons — wallet-source scenarios (e.g. income_budgeting) */}
-              {!isInboxSource && isCurrentViewed && !isAnswered && (
-                <div className="mt-8 max-w-2xl">
-                  <h4 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
-                    How do you respond?
-                  </h4>
-                  <div className="space-y-2">
-                    {viewedScenario.choices.map(c => (
-                      <button
-                        key={c.index}
-                        disabled={submitting}
-                        onClick={() => handleAnswer(c.index)}
-                        className="w-full text-left p-4 rounded-xl border border-border bg-card hover:border-primary hover:bg-primary/5 transition-smooth disabled:opacity-50 group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 rounded-full bg-muted text-xs flex items-center justify-center font-semibold group-hover:bg-primary group-hover:text-primary-foreground transition-smooth">
-                            {String.fromCharCode(65 + c.index)}
-                          </span>
-                          <span className="text-sm">{c.label}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Redirect hints when a different screen is needed */}
-              {viewedScenario.source === "sms" || viewedScenario.source === "notification" ? (
-                <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>This message is in your </span>
-                  <button onClick={() => setActiveWindow("notifications")} className="text-primary underline">Notifications</button>
-                </div>
-              ) : viewedScenario.source === "bills" ? (
-                <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Receipt className="w-4 h-4" />
-                  <span>This bill is in your </span>
-                  <button onClick={() => setActiveWindow("bills")} className="text-primary underline">Bills</button>
-                </div>
-              ) : null}
             </>
           ) : (
             <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
@@ -260,9 +311,10 @@ export function InboxScreen() {
         </div>
       </div>
 
-      {formOpen && viewedScenario && (
+      {formOpen && viewedScenario && user && (
         <PhishingFormModal
           scenarioType={viewedScenario.type}
+          persona={user.persona}
           onSubmit={handleFormSubmit}
           onClose={() => setFormOpen(false)}
         />

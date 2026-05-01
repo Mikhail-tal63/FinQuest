@@ -1,13 +1,12 @@
-import { Mail, Wallet, User, MessageSquare, Receipt } from "lucide-react";
+import { Mail, Wallet, User, Receipt } from "lucide-react";
 import { useFinQuest, WindowKey } from "@/context/FinQuestContext";
 import { cn } from "@/lib/utils";
 
 const ITEMS: { key: WindowKey; label: string; Icon: typeof Mail; gradient: string }[] = [
-  { key: "inbox",         label: "Inbox",         Icon: Mail,          gradient: "dock-blue"   },
-  { key: "notifications", label: "Notifications",  Icon: MessageSquare, gradient: "dock-violet" },
-  { key: "bills",         label: "Bills",          Icon: Receipt,       gradient: "dock-green"  },
-  { key: "wallet",        label: "Wallet",         Icon: Wallet,        gradient: "dock-orange" },
-  { key: "profile",       label: "Profile",        Icon: User,          gradient: "dock-sky"    },
+  { key: "inbox",   label: "Inbox",   Icon: Mail,    gradient: "dock-blue"   },
+  { key: "bills",   label: "Bills",   Icon: Receipt, gradient: "dock-green"  },
+  { key: "wallet",  label: "Wallet",  Icon: Wallet,  gradient: "dock-orange" },
+  { key: "profile", label: "Profile", Icon: User,    gradient: "dock-sky"    },
 ];
 
 export function Dock() {
@@ -22,9 +21,7 @@ export function Dock() {
     ).length;
 
   const badges: Partial<Record<WindowKey, number>> = {
-    inbox:         pending(["inbox", "wallet"]),
-    notifications: pending(["sms", "notification"]),
-    bills:         pending(["bills"]),
+    inbox: pending(["inbox", "wallet"]),
   };
 
   return (

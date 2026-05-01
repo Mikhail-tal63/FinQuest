@@ -1,11 +1,7 @@
 const Scenario = require('../models/Scenario')
 
-async function getScenariosByRole(role, limit = 10) {
-  return Scenario.find({
-    targetRoles: role,
-  })
-    .limit(limit)
-    .select('-__v')
+async function getScenariosByRole(role) {
+  return Scenario.find({ targetRoles: role }).select('-__v')
 }
 
 async function getScenariosBySource(source) {

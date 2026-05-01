@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Trophy, Shield, Eye, TrendingDown, TrendingUp, CheckCircle, XCircle, RotateCcw, ArrowRight } from "lucide-react";
 import { api, FinalReport as Report } from "@/lib/api";
 import { useFinQuest } from "@/context/FinQuestContext";
-import { EXPENSES } from "./BillsScreen";
+import { EXPENSES } from "@/lib/expenses";
 import { cn } from "@/lib/utils";
 
 export function FinalReport() {

@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, ReactNode, useCallback, useEffect, useRef } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect, useRef, useMemo } from "react";
 import { api, User, Scenario, Persona, AnswerResult } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { calcExpenses, EXPENSES } from "@/lib/expenses";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,10 +13,10 @@ export interface Transaction {
   type: 'debit' | 'credit' | 'freeze';
 }
 
-export type WindowKey = "persona" | "inbox" | "wallet" | "notifications" | "bills" | "profile" | "final";
+export type WindowKey = "persona" | "inbox" | "wallet" | "bills" | "profile" | "final";
 
 // 1 real minute = 1 game day  (adjust here to speed up / slow down)
-const MS_PER_GAME_DAY = 60 * 1000;
+const MS_PER_GAME_DAY = 30 * 1000;
 const MS_PER_GAME_HOUR = Math.floor(MS_PER_GAME_DAY / 24);
 
 const MONTHLY_SALARY: Record<Persona, number> = {
@@ -34,9 +35,11 @@ interface Ctx {
   gameDay: number;
   gameHour: number;
   salary: number;
+  computedBalance: number;
   transactions: Transaction[];
   accountFrozen: boolean;
   optionalOff: Set<string>;
+  lockedOptional: Set<string>;
   activeWindow: WindowKey;
   loading: boolean;
   setActiveWindow: (w: WindowKey) => void;
@@ -46,6 +49,7 @@ interface Ctx {
   addTransaction: (tx: Transaction) => void;
   freezeAccount: () => void;
   toggleOptional: (id: string) => void;
+  skipDay: () => void;
 }
 
 const FinQuestContext = createContext<Ctx | undefined>(undefined);
@@ -63,12 +67,16 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [accountFrozen, setAccountFrozen] = useState(false);
   const [optionalOff, setOptionalOff] = useState<Set<string>>(new Set());
+  const [lockedOptional, setLockedOptional] = useState<Set<string>>(new Set());
   const [activeWindow, setActiveWindow] = useState<WindowKey>("persona");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const allScenariosRef = useRef(allScenarios);
   allScenariosRef.current = allScenarios;
+
+  const lockedOptionalRef = useRef(lockedOptional);
+  lockedOptionalRef.current = lockedOptional;
 
   // ── Game clock ─────────────────────────────────────────────────────────────
 
@@ -88,12 +96,19 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(tick);
   }, [sessionId]);
 
-  // Month-end trigger
+  // Game-end trigger (after 2 months)
   useEffect(() => {
-    if (gameDay > 30 && sessionId) {
+    if (gameDay > 60 && sessionId) {
       setActiveWindow("final");
     }
   }, [gameDay, sessionId]);
+
+  // Clear subscription locks at the start of month 2
+  useEffect(() => {
+    if (gameDay === 31) {
+      setLockedOptional(new Set());
+    }
+  }, [gameDay]);
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -112,7 +127,9 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
       setGameHour(0);
       setTransactions([]);
       setAccountFrozen(false);
-      setOptionalOff(new Set());
+      const allOptionalIds = new Set(EXPENSES[persona].filter(e => !e.mandatory).map(e => e.id));
+      setOptionalOff(allOptionalIds);
+      setLockedOptional(new Set());
       setActiveWindow("inbox");
     } catch (err) {
       toast({
@@ -172,13 +189,37 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
     }, ...prev]);
   }, []);
 
+  const skipDay = useCallback(() => {
+    setGameHour(0);
+    setGameDay(d => d + 1);
+  }, []);
+
   const toggleOptional = useCallback((id: string) => {
     setOptionalOff(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+      if (prev.has(id)) {
+        // Turning ON — subscribe and lock for this month
+        setLockedOptional(l => new Set([...l, id]));
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      } else {
+        // Turning OFF — only allowed if not locked
+        if (lockedOptionalRef.current.has(id)) return prev;
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      }
     });
   }, []);
+
+  // Live balance: (salary − expenses) × elapsed months + scenario effects
+  const computedBalance = useMemo(() => {
+    if (!user) return 0;
+    const { grandTotal } = calcExpenses(user.persona, optionalOff);
+    const scenarioNet = transactions.reduce((s, t) => s + t.amount, 0);
+    const months = gameDay <= 30 ? 1 : 2;
+    return salary * months - grandTotal * months + scenarioNet;
+  }, [salary, user, optionalOff, transactions, gameDay]);
 
   return (
     <FinQuestContext.Provider value={{
@@ -192,15 +233,18 @@ export function FinQuestProvider({ children }: { children: ReactNode }) {
       transactions,
       accountFrozen,
       optionalOff,
+      lockedOptional,
       activeWindow,
       loading,
       setActiveWindow,
       selectPersona,
       refreshUser,
       answerScenario,
+      computedBalance,
       addTransaction,
       freezeAccount,
       toggleOptional,
+      skipDay,
     }}>
       {children}
     </FinQuestContext.Provider>

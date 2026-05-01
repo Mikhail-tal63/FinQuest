@@ -4,7 +4,6 @@ import { WindowChrome } from "./WindowChrome";
 import { PersonaScreen } from "./PersonaScreen";
 import { InboxScreen } from "./InboxScreen";
 import { WalletScreen } from "./WalletScreen";
-import { NotificationsScreen } from "./NotificationsScreen";
 import { BillsScreen } from "./BillsScreen";
 import { ProfileScreen } from "./ProfileScreen";
 import { FinalReport } from "./FinalReport";
@@ -18,7 +17,6 @@ export function DesktopLayout() {
     switch (activeWindow) {
       case "inbox":         return <InboxScreen />;
       case "wallet":        return <WalletScreen />;
-      case "notifications": return <NotificationsScreen />;
       case "bills":         return <BillsScreen />;
       case "profile":       return <ProfileScreen />;
       case "final":         return <FinalReport />;

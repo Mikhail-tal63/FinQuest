@@ -406,238 +406,413 @@ const scenarios = [
     ],
   },
 
-  // ─── URGENT MONEY TRANSFER ───────────────────────────────────────────────────
-  {
-    title: 'Urgent Money Transfer Request',
-    description:
-      'You receive an SMS from an unknown number: "Hi, it\'s [Friend Name]. I\'m stranded and my wallet was stolen. I urgently need you to transfer $300 to this account: 4829-7731-0042. I\'ll pay you back first thing tomorrow. Please hurry — I\'m stuck and really need your help right now!"',
-    type: 'urgent_transfer',
-    source: 'sms',
-    scheduledDay: 6,
-    emailMeta: {
-      sender: '+1 (555) 847-2931',
-      subject: 'URGENT — Transfer $300 NOW',
-      preview: 'I\'m stranded, wallet stolen. Need $300 transferred immediately.',
-      riskBadge: 'Suspicious Transfer',
-    },
-    realContext:
-      'Urgency is the #1 manipulation tool in financial fraud. Scammers impersonate friends or family to exploit trust and panic. Legitimate emergencies can always wait two minutes for a phone call verification.',
-    difficulty: 'medium',
-    targetRoles: ['student', 'employee', 'freelancer'],
-    choices: [
-      {
-        text: 'Call your friend on their known number to verify before doing anything.',
-        qualityLevel: 'best',
-        feedback:
-          'Perfect. You called your friend\'s real number and discovered their phone was never stolen — it was a scam. Urgency was fabricated to stop you from thinking clearly. Two minutes saved you $300.',
-        effects: { xp: 55, securityScore: 12, awarenessScore: 12, balance: 0 },
-        timeline: [
-          { day: 1, event: 'You call your friend. They confirm they are safe and never sent this message.', isPositive: true },
-          { day: 1, event: 'Scam identified. Unknown number blocked and reported.', isPositive: true },
-          { day: 7, event: 'Awareness score rises — you recognised urgency as a manipulation tactic.', isPositive: true },
-        ],
-      },
-      {
-        text: 'Transfer the $300 immediately — it sounds like a real emergency.',
-        qualityLevel: 'worst',
-        feedback:
-          'The account belonged to a scammer. Your friend never knew about this message — their identity was impersonated. Peer-to-peer transfers are almost never reversible once sent.',
-        effects: { xp: 0, securityScore: -20, awarenessScore: -8, balance: -300 },
-        timeline: [
-          { day: 1, event: '$300 transferred to scammer\'s account.', isPositive: false },
-          { day: 1, event: 'You call your friend — they have no idea what you are talking about.', isPositive: false },
-          { day: 2, event: 'Transfer reported to bank. Peer-to-peer transfers rarely recovered.', isPositive: false },
-          { day: 14, event: '$300 permanently lost. Bank unable to reverse the transfer.', isPositive: false },
-        ],
-      },
-      {
-        text: 'Reply to the SMS and ask for a detail only your real friend would know before sending.',
-        qualityLevel: 'average',
-        feedback:
-          'Smart to slow down and verify. But scammers often gather personal details from social media. Calling on a known number is far more reliable than texting back the suspicious number.',
-        effects: { xp: 25, securityScore: 5, awarenessScore: 8, balance: 0 },
-        timeline: [
-          { day: 1, event: 'You ask for verification. Scammer stalls with a vague answer.', isPositive: true },
-          { day: 1, event: 'Suspicious response prompts you to call your friend directly.', isPositive: true },
-          { day: 1, event: 'Friend confirms it is a scam. No money lost.', isPositive: true },
-        ],
-      },
-    ],
-  },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MONTH 2 SCENARIOS (Days 31–58)
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  // ─── INTERNET BILL ───────────────────────────────────────────────────────────
+  // ─── PHISHING: BANK (Month 2) ────────────────────────────────────────────
   {
-    title: 'Internet Bill Due Today — $65.00',
+    title: 'Fraud Alert: Unusual Login Detected on Your Account',
     description:
-      'Your monthly internet bill of $65.00 from FastConnect is due today. You have $420 in your available balance. You\'ve been meaning to buy new headphones this week ($80), and you also have a dinner plan with friends on Friday. The bill reads: "Payment due: Today. Late fee after 3 days: $12.00. Service suspension after 7 days."',
-    type: 'internet_bill',
-    source: 'bills',
-    scheduledDay: 1,
+      'You receive an email: "We have detected an unusual login to your account from an unrecognized device in another country. For your security, your online banking has been temporarily locked. Please click the link below to confirm your identity and unlock your account within 12 hours to avoid permanent suspension. Click here: http://secure-bankverify.net/unlock"',
+    type: 'phishing_bank',
+    source: 'inbox',
+    scheduledDay: 33,
     emailMeta: {
-      sender: 'FastConnect Internet',
-      subject: 'Bill Due Today: $65.00 — Internet Service',
-      preview: 'Your monthly internet bill of $65 is due today. Pay now to avoid a $12 late fee.',
-      riskBadge: 'Due Today',
+      sender: 'security@secure-bankverify.net',
+      subject: 'Fraud Alert: Your account has been locked – Verify Now',
+      preview: 'Unusual login detected. Unlock your account within 12 hours.',
+      riskBadge: 'Phishing',
     },
     realContext:
-      'Recurring bills like internet and utilities should always be paid on time. Late fees add up and missed payments can affect your credit score. The $12 late fee on a $65 bill is an 18% penalty — entirely avoidable.',
+      'Banks lock accounts through their own systems, not email links. The domain "secure-bankverify.net" has no connection to any real bank.',
     difficulty: 'easy',
     targetRoles: ['student', 'employee', 'freelancer'],
     choices: [
       {
-        text: 'Pay the $65 bill right now — obligations come before discretionary spending.',
+        text: 'Ignore the email and log in directly through your bank\'s official app.',
         qualityLevel: 'best',
         feedback:
-          'Excellent financial discipline. Paying bills on time protects your credit score, avoids late fees, and keeps your services running. The headphones can wait — the bill cannot.',
-        effects: { xp: 50, securityScore: 0, awarenessScore: 12, balance: -65 },
+          'Correct. Your app showed no lock or unusual activity. The email was a clone of a legitimate fraud alert, designed to create panic.',
+        effects: { xp: 50, securityScore: 10, awarenessScore: 8, balance: 0 },
         timeline: [
-          { day: 1, event: '$65 paid. No late fee. Internet service uninterrupted.', isPositive: true },
-          { day: 3, event: 'You avoided the $12 late fee — that\'s money saved.', isPositive: true },
-          { day: 30, event: 'On-time payment recorded. Credit score unaffected.', isPositive: true },
+          { day: 1, event: 'Bank app shows no fraud alert or account lock.', isPositive: true },
+          { day: 1, event: 'Phishing email reported to bank fraud team.', isPositive: true },
+          { day: 5, event: 'Bank confirms domain is a known fraud site.', isPositive: true },
         ],
       },
       {
-        text: 'Delay it 2 days — you\'ll pay it after the weekend, still within the grace period.',
-        qualityLevel: 'average',
-        feedback:
-          'You technically avoided the late fee this time, but habitual delaying is risky. One forgotten errand or unexpected expense in those 2 days could push you past the deadline.',
-        effects: { xp: 20, securityScore: 0, awarenessScore: 5, balance: -65 },
-        timeline: [
-          { day: 1, event: 'Bill left unpaid. 3-day grace period starts.', isPositive: false },
-          { day: 3, event: 'You remember and pay just before the late fee kicks in.', isPositive: true },
-          { day: 3, event: 'No late fee this time — but it was a close call.', isPositive: true },
-        ],
-      },
-      {
-        text: 'Skip it for now — the headphones and dinner are this week, you\'ll deal with the bill later.',
+        text: 'Click the link and verify your details to unlock the account quickly.',
         qualityLevel: 'worst',
         feedback:
-          'Skipping a bill for discretionary spending is a dangerous habit. You paid a $12 late fee, lost internet access for a day, and your account now shows a late payment.',
-        effects: { xp: 0, securityScore: 0, awarenessScore: -8, balance: -77 },
+          'The "unlock" page captured your full banking credentials. Funds were moved within the hour.',
+        effects: { xp: 0, securityScore: -25, awarenessScore: -5, balance: -1500 },
         timeline: [
-          { day: 1, event: 'Bill ignored. You buy the headphones and enjoy dinner.', isPositive: false },
-          { day: 4, event: '$12 late fee automatically charged to your account.', isPositive: false },
-          { day: 7, event: 'Internet service suspended. You pay $77 to restore it.', isPositive: false },
-          { day: 8, event: 'Service restored — but a late payment is now on your record.', isPositive: false },
-          { day: 30, event: 'Credit report shows one missed payment — takes months to recover.', isPositive: false },
+          { day: 1, event: 'Credentials entered on phishing page.', isPositive: false },
+          { day: 1, event: '$1,500 transferred to foreign account within 60 minutes.', isPositive: false },
+          { day: 3, event: 'Bank investigation opened. Card cancelled.', isPositive: false },
+          { day: 21, event: '$500 recovered. $1,000 permanently lost.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Call the number printed on the back of your debit card to check.',
+        qualityLevel: 'average',
+        feedback:
+          'Calling the number on your card is the right instinct. The bank confirmed there was no lock — email was fraudulent.',
+        effects: { xp: 35, securityScore: 7, awarenessScore: 7, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Bank confirms account is fully active. No lock detected.', isPositive: true },
+          { day: 1, event: 'Fraud email reported by phone.', isPositive: true },
         ],
       },
     ],
   },
 
-
-  // ─── TEMPTING PURCHASE ───────────────────────────────────────────────────────
+  // ─── INVESTMENT SCAM (Month 2) ────────────────────────────────────────────
   {
-    title: 'Flash Sale: Galaxy Tab S9 — 40% Off Today Only',
+    title: 'Exclusive NFT Portfolio — Guaranteed 300% ROI',
     description:
-      '⚡ FLASH SALE — 40% OFF! Samsung Galaxy Tab S9 Ultra: $389 (was $649). Only 4 units left in stock! Deal expires in 2 hours. Your friends already grabbed theirs. Tap now before it\'s gone forever!',
-    type: 'tempting_purchase',
-    source: 'notification',
-    scheduledDay: 20,
+      'A direct message arrives: "Hey! I\'ve been building my NFT portfolio with CryptoVaultX for the last two months. I turned $300 into $1,800 — all documented. They\'re opening a new round this week. Minimum entry is $200. The platform is licensed, your funds are insured, and returns are locked in by contract. I can get you whitelisted before Friday."',
+    type: 'investment_scam',
+    source: 'inbox',
+    scheduledDay: 38,
     emailMeta: {
-      sender: 'ShopNow App',
-      subject: 'Flash Sale: 40% Off Galaxy Tab S9 — 2 Hours Only',
-      preview: '40% OFF today only! Galaxy Tab S9 for $389. Only 4 left — deal ends in 2 hours.',
-      riskBadge: 'Impulse Buy',
+      sender: 'referral@cryptovaultx.io',
+      subject: 'CryptoVaultX — Your whitelist spot is reserved',
+      preview: 'Your friend reserved you a whitelist spot. 300% ROI guaranteed.',
+      riskBadge: 'High Risk',
     },
     realContext:
-      '"Limited time," "only X left," and "your friends bought it" are deliberate psychological triggers designed to bypass rational thinking. Flash sales exploit FOMO (fear of missing out) to rush you into unplanned spending.',
-    difficulty: 'medium',
+      '"Licensed", "insured", and "guaranteed ROI" are meaningless claims on unregulated crypto platforms. No investment guarantees returns. NFT scams work by paying early investors with new deposits until the platform disappears.',
+    difficulty: 'hard',
     targetRoles: ['student', 'employee', 'freelancer'],
     choices: [
       {
-        text: 'Skip it — this isn\'t in your budget and you don\'t need a tablet right now.',
+        text: 'Decline and look up CryptoVaultX on a financial regulator\'s official website.',
         qualityLevel: 'best',
         feedback:
-          'Excellent impulse control. You recognised the urgency and scarcity tactics for what they are: psychological manipulation. If you genuinely need a tablet, plan it in your next monthly budget.',
-        effects: { xp: 55, securityScore: 0, awarenessScore: 12, balance: 0 },
+          'Smart. The regulator\'s site shows no record of CryptoVaultX. The platform was later exposed as a rug-pull that stole $2.3 million from users.',
+        effects: { xp: 60, securityScore: 5, awarenessScore: 15, balance: 0 },
         timeline: [
-          { day: 1, event: 'Notification dismissed. $389 stays in your account.', isPositive: true },
-          { day: 3, event: 'The "flash sale" price reappears — it wasn\'t as rare as advertised.', isPositive: true },
-          { day: 30, event: 'You never missed the tablet. Your savings goal stays on track.', isPositive: true },
+          { day: 1, event: 'No registration found on financial regulator database.', isPositive: true },
+          { day: 14, event: 'CryptoVaultX shuts down. Thousands of investors lose funds.', isPositive: true },
+          { day: 30, event: 'News coverage confirms it was a coordinated rug-pull.', isPositive: true },
         ],
       },
       {
-        text: 'Research the price history online first before making any decision.',
-        qualityLevel: 'average',
-        feedback:
-          'Smart move. A quick check on price-tracking tools (like CamelCamelCamel) shows this price appears several times a year — the urgency was manufactured. You decided to wait for a planned purchase.',
-        effects: { xp: 30, securityScore: 0, awarenessScore: 8, balance: 0 },
-        timeline: [
-          { day: 1, event: 'Price history checked — same price ran last month too.', isPositive: true },
-          { day: 1, event: 'You decide to wait. No unplanned spending today.', isPositive: true },
-          { day: 14, event: 'You budget for the tablet next month instead.', isPositive: true },
-        ],
-      },
-      {
-        text: 'Buy it immediately — 40% off is incredible and it\'s running out fast!',
+        text: 'Invest the $200 minimum — the risk seems manageable.',
         qualityLevel: 'worst',
         feedback:
-          'You fell for the classic FOMO trap. The deal was real, but the urgency was not — similar sales run monthly. Now $389 is gone that you hadn\'t budgeted for, and bills are tighter this month.',
-        effects: { xp: 0, securityScore: 0, awarenessScore: -8, balance: -389 },
+          'The platform showed you fake gains, then asked you to deposit more. You ended up sending $900 before it vanished.',
+        effects: { xp: 0, securityScore: -10, awarenessScore: -5, balance: -900 },
         timeline: [
-          { day: 1, event: '$389 spent on impulse. Excitement is high.', isPositive: false },
-          { day: 5, event: 'Monthly bills arrive. You\'re $389 shorter than expected.', isPositive: false },
-          { day: 7, event: 'You notice the same tablet is on sale again at the same price.', isPositive: false },
-          { day: 30, event: 'Savings goal missed this month because of the unplanned purchase.', isPositive: false },
+          { day: 1, event: '$200 deposited. Dashboard shows fictitious +40% after one week.', isPositive: false },
+          { day: 10, event: 'Platform urges you to "lock in gains" with $700 more.', isPositive: false },
+          { day: 21, event: 'Withdrawal requests fail. Site goes offline.', isPositive: false },
+          { day: 60, event: 'No recovery. Offshore entity, untraceable.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Ask the friend for the company\'s registration number to verify independently.',
+        qualityLevel: 'average',
+        feedback:
+          'Your friend provides a fake registration number. Looking it up correctly would have revealed no match — good that you asked, but you need to complete the check.',
+        effects: { xp: 20, securityScore: 2, awarenessScore: 5, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Fake registration number provided.', isPositive: false },
+          { day: 2, event: 'You search the regulator database — no match found.', isPositive: true },
+          { day: 2, event: 'You decline. Your money stays safe.', isPositive: true },
         ],
       },
     ],
   },
 
-  // ─── INCOME BUDGETING ─────────────────────────────────────────────────────────
+  // ─── PRIZE NOTIFICATION (Month 2) ────────────────────────────────────────
   {
-    title: 'Income Budgeting: Allocate Your Salary',
+    title: 'You\'ve Been Selected for a $1,000 Loyalty Reward',
     description:
-      'Your monthly salary of $3,000 just landed in your account. You have fixed bills (rent, electricity, internet), daily expenses (food, transport, entertainment), and financial goals you want to save toward. How do you split your income this month?',
-    type: 'income_budgeting',
-    source: 'wallet',
-    scheduledDay: 2,
+      'An email arrives from "Customer Loyalty Program": "As a valued customer, you have been randomly selected to receive a $1,000 loyalty reward. To claim your reward, complete a short survey and provide your payment card details for identity verification. This offer expires in 24 hours and cannot be transferred."',
+    type: 'prize_notification',
+    source: 'inbox',
+    scheduledDay: 42,
     emailMeta: {
-      sender: 'Wallet',
-      subject: 'New Income Received: $3,000',
-      preview: 'Your monthly salary has arrived. How will you allocate it?',
-      riskBadge: 'Budgeting',
+      sender: 'rewards@loyalty-customer-program.com',
+      subject: 'Congratulations — $1,000 Loyalty Reward Awaits You',
+      preview: 'You\'ve been selected for a $1,000 reward. Claim in the next 24 hours.',
+      riskBadge: 'Scam',
     },
     realContext:
-      'Financial experts recommend the 50/30/20 rule: 50% for needs (bills), 30% for wants (expenses), 20% for savings. This balanced approach builds financial security while still letting you enjoy life.',
+      '"Identity verification" via credit card is a standard way scammers harvest card details. Legitimate loyalty programs never ask for payment info by email.',
     difficulty: 'easy',
     targetRoles: ['student', 'employee', 'freelancer'],
     choices: [
       {
-        text: 'Bills: $1,500 (50%) • Expenses: $900 (30%) • Savings: $600 (20%) — Follow the 50/30/20 rule.',
+        text: 'Delete the email — legitimate loyalty programs never ask for card details.',
         qualityLevel: 'best',
         feedback:
-          'Excellent! The 50/30/20 rule is the gold standard of personal budgeting. By consistently saving 20%, you build a real financial safety net that protects you from unexpected events.',
-        effects: { xp: 60, securityScore: 0, awarenessScore: 15, balance: 600 },
+          'Correct. No real loyalty program asks for payment information to deliver a reward. The 24-hour urgency was designed to stop you from thinking clearly.',
+        effects: { xp: 45, securityScore: 8, awarenessScore: 12, balance: 0 },
         timeline: [
-          { day: 1, event: 'Salary allocated: Bills ✓  Expenses ✓  Savings ✓', isPositive: true },
-          { day: 30, event: 'You saved exactly $600 at month end — just as planned.', isPositive: true },
-          { day: 90, event: 'Savings account hits $1,800 — two months of emergencies covered.', isPositive: true },
+          { day: 1, event: 'Email deleted. No data exposed.', isPositive: true },
+          { day: 7, event: 'Awareness score rises. You\'re building strong habits.', isPositive: true },
         ],
       },
       {
-        text: 'Bills: $2,000 (67%) • Expenses: $1,000 (33%) • Savings: $0 — Pay everything, save nothing.',
+        text: 'Complete the survey and enter your card details to claim the $1,000.',
         qualityLevel: 'worst',
         feedback:
-          'Dangerous. Zero savings means any small emergency can destabilize you financially. Even if bills are high, always carve out at least 10% for savings — it compounds over time.',
-        effects: { xp: 5, securityScore: 0, awarenessScore: -10, balance: 0 },
+          'Your card was charged for multiple subscriptions immediately. The "reward" never arrived.',
+        effects: { xp: 0, securityScore: -20, awarenessScore: -10, balance: -450 },
         timeline: [
-          { day: 1, event: 'Entire salary spent. No savings buffer created.', isPositive: false },
-          { day: 15, event: 'Your car needs a $400 repair — no funds available.', isPositive: false },
-          { day: 16, event: 'You borrow to cover the emergency, adding financial stress.', isPositive: false },
+          { day: 1, event: 'Card details captured on scam page.', isPositive: false },
+          { day: 1, event: '$14.99 trial charge appears instantly.', isPositive: false },
+          { day: 7, event: 'Three more unauthorized charges totalling $450.', isPositive: false },
+          { day: 10, event: 'Card cancelled. Chargeback filed.', isPositive: false },
+          { day: 25, event: '$380 recovered. Significant inconvenience and stress.', isPositive: true },
         ],
       },
       {
-        text: 'Bills: $1,200 (40%) • Expenses: $1,500 (50%) • Savings: $300 (10%) — Light savings, heavier spending.',
+        text: 'Call the company whose name is in the email to ask if the reward is real.',
         qualityLevel: 'average',
         feedback:
-          'Better than nothing! But your spending is a bit high. Try to gradually cut discretionary expenses and push savings toward 20% — the long-term difference is significant.',
-        effects: { xp: 30, securityScore: 0, awarenessScore: 8, balance: 300 },
+          'Good initiative, but the email doesn\'t actually name a real company. You should also forward it to your country\'s anti-fraud reporting service.',
+        effects: { xp: 25, securityScore: 4, awarenessScore: 7, balance: 0 },
         timeline: [
-          { day: 1, event: 'Saved $300 — a step in the right direction.', isPositive: true },
-          { day: 30, event: 'Discretionary spending was higher than necessary this month.', isPositive: false },
-          { day: 60, event: 'You review your budget and commit to increasing savings next month.', isPositive: true },
+          { day: 1, event: 'No real company matches the sender. Scam confirmed.', isPositive: true },
+          { day: 1, event: 'No data entered. Account safe.', isPositive: true },
+        ],
+      },
+    ],
+  },
+
+  // ─── TAX REFUND (Month 2) ─────────────────────────────────────────────────
+  {
+    title: 'Amended Return: Additional Refund of $1,200 Approved',
+    description:
+      'An email from "Revenue Processing Centre" states: "A review of your previous tax filing has identified an error in your favour. An additional refund of $1,200 has been approved. To receive your payment, you must verify your current bank account within 48 hours. Failure to verify will result in the refund being cancelled."',
+    type: 'tax_refund',
+    source: 'inbox',
+    scheduledDay: 45,
+    emailMeta: {
+      sender: 'refunds@revenue-processing-centre.com',
+      subject: 'Additional Tax Refund Approved – Verify Your Account',
+      preview: 'An amended return found $1,200 in your favour. Verify your bank account.',
+      riskBadge: 'Phishing',
+    },
+    realContext:
+      'Tax authorities process amended-return refunds automatically — they never ask you to provide bank details via email to "unlock" a refund. The domain is not a government address.',
+    difficulty: 'medium',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Log in to the official government tax portal directly to check for any amended return.',
+        qualityLevel: 'best',
+        feedback:
+          'Perfect. The portal showed no amended return and no pending refund. You reported the email and moved on without any loss.',
+        effects: { xp: 50, securityScore: 10, awarenessScore: 8, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Official tax portal: no amended return on file.', isPositive: true },
+          { day: 1, event: 'Phishing email forwarded to government fraud hotline.', isPositive: true },
+          { day: 7, event: 'Domain taken down following mass reporting.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Click the link and provide your bank details to claim the $1,200 refund.',
+        qualityLevel: 'worst',
+        feedback:
+          'Your bank details were harvested immediately. An unauthorized ACH transfer cleared your account the same night.',
+        effects: { xp: 0, securityScore: -25, awarenessScore: -8, balance: -700 },
+        timeline: [
+          { day: 1, event: 'Bank account details entered on phishing form.', isPositive: false },
+          { day: 1, event: '$700 transferred via unauthorized ACH.', isPositive: false },
+          { day: 3, event: 'Bank freezes account pending investigation.', isPositive: false },
+          { day: 20, event: '$250 recovered. Remaining $450 lost permanently.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Call your accountant or tax adviser to ask if an amended return was filed.',
+        qualityLevel: 'average',
+        feedback:
+          'A good step — your accountant confirmed no amendment was filed. However, you should also report the email to the authorities.',
+        effects: { xp: 35, securityScore: 7, awarenessScore: 7, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Accountant confirms no amended return. Email is fraudulent.', isPositive: true },
+          { day: 1, event: 'Email deleted. No financial loss.', isPositive: true },
+        ],
+      },
+    ],
+  },
+
+  // ─── SALARY UPDATE (Month 2) ─────────────────────────────────────────────
+  {
+    title: 'Urgent: Direct Deposit Details Must Be Updated Today',
+    description:
+      'You get a text message followed by an email: "URGENT: Your direct deposit account on file has been flagged as invalid by our payment processor. You must update your banking details before 5 PM today to receive your next salary payment. Use the link below to re-enter your information securely."',
+    type: 'salary_update',
+    source: 'inbox',
+    scheduledDay: 48,
+    emailMeta: {
+      sender: 'payroll@direct-deposit-update.com',
+      subject: 'Action Required: Direct Deposit Account Invalid – Update Now',
+      preview: 'Your direct deposit is flagged invalid. Update details before 5 PM today.',
+      riskBadge: 'Suspicious',
+    },
+    realContext:
+      'Payroll systems don\'t invalidate bank accounts without notice from the bank itself. Combining a text + email creates false urgency — a known social engineering technique.',
+    difficulty: 'hard',
+    targetRoles: ['employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Call your payroll department directly using the number in the company directory.',
+        qualityLevel: 'best',
+        feedback:
+          'Exactly right. Payroll confirmed your bank details on file are valid and no update was requested. IT was immediately notified of the attack.',
+        effects: { xp: 55, securityScore: 12, awarenessScore: 10, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Payroll confirms account details are correct and unchanged.', isPositive: true },
+          { day: 1, event: 'IT security team notified. Source of the attack investigated.', isPositive: true },
+          { day: 2, event: 'Company-wide alert issued. Attack traced to external threat actor.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Update your bank details through the link — you can\'t afford to miss your salary.',
+        qualityLevel: 'worst',
+        feedback:
+          'Your salary for the month was redirected to the attacker\'s account. You had to file a formal fraud claim and go without pay during the investigation.',
+        effects: { xp: 0, securityScore: -30, awarenessScore: -10, balance: -2800 },
+        timeline: [
+          { day: 1, event: 'Fraudulent bank details submitted through phishing portal.', isPositive: false },
+          { day: 5, event: 'Salary deposited — directly into attacker\'s account.', isPositive: false },
+          { day: 6, event: 'You notice missing salary. HR and bank both contacted.', isPositive: false },
+          { day: 45, event: 'Investigation ongoing. Full recovery unlikely within 90 days.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Ignore the link but do nothing else — it\'s probably spam.',
+        qualityLevel: 'average',
+        feedback:
+          'Ignoring it kept you safe, but doing nothing means the attack was never reported. Other colleagues may have fallen for it.',
+        effects: { xp: 10, securityScore: 1, awarenessScore: 3, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Link ignored. Your salary is safe.', isPositive: true },
+          { day: 3, event: 'A colleague falls for the same attack. Loss reported to HR.', isPositive: false },
+          { day: 4, event: 'If you had reported it, the colleague would have been warned.', isPositive: false },
+        ],
+      },
+    ],
+  },
+
+  // ─── ACCOUNT VERIFICATION (Month 2) ─────────────────────────────────────
+  {
+    title: 'Streaming Account: Billing Error – Card Needs Re-verification',
+    description:
+      'An email lands in your inbox: "We were unable to process your recent payment. To avoid losing access to your account, please re-verify your credit card details within 24 hours. If you do not update your billing information, your account will be suspended and your viewing history deleted."',
+    type: 'account_verification',
+    source: 'inbox',
+    scheduledDay: 52,
+    emailMeta: {
+      sender: 'billing@streamingservice-support.net',
+      subject: 'Billing Error – Update Your Card to Keep Your Account',
+      preview: 'Payment failed. Re-verify your card within 24 hours or lose your account.',
+      riskBadge: 'Phishing',
+    },
+    realContext:
+      'Streaming platforms always let you update payment details directly within the app or website. They never send you to a third-party domain for billing updates.',
+    difficulty: 'medium',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Open the streaming app directly and check the billing section — not via the email link.',
+        qualityLevel: 'best',
+        feedback:
+          'Correct. The app showed no billing error and your subscription was active. The email was a phishing attempt targeting streaming subscribers.',
+        effects: { xp: 55, securityScore: 12, awarenessScore: 10, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Streaming app: no billing issue found. Subscription active.', isPositive: true },
+          { day: 1, event: 'Email reported through the app\'s phishing form.', isPositive: true },
+          { day: 3, event: 'Streaming service warns all users of the phishing campaign.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Click the link and re-enter your card to avoid losing your subscription.',
+        qualityLevel: 'worst',
+        feedback:
+          'Your card was cloned instantly. Fraudulent purchases appeared within hours on your statement.',
+        effects: { xp: 0, securityScore: -22, awarenessScore: -8, balance: -580 },
+        timeline: [
+          { day: 1, event: 'Card details entered on fake billing page.', isPositive: false },
+          { day: 1, event: 'Two fraudulent transactions totalling $580 appear immediately.', isPositive: false },
+          { day: 2, event: 'Card cancelled. Chargeback filed.', isPositive: false },
+          { day: 18, event: '$480 recovered. $100 processing fee absorbed by you.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Check your actual bank statement to see if a payment really failed.',
+        qualityLevel: 'average',
+        feedback:
+          'Smart — your bank statement showed the subscription payment went through normally. The email was confirmed as fake. Report it to the streaming service as well.',
+        effects: { xp: 30, securityScore: 5, awarenessScore: 7, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Bank statement shows subscription paid successfully.', isPositive: true },
+          { day: 1, event: 'Email confirmed as phishing. No data entered.', isPositive: true },
+        ],
+      },
+    ],
+  },
+
+  // ─── PHISHING GRANT (Month 2) ─────────────────────────────────────────────
+  {
+    title: 'Housing Assistance Grant – $2,800 Available',
+    description:
+      'An email arrives: "You may qualify for a $2,800 housing assistance grant from the National Housing Relief Fund. This grant does not need to be repaid. To claim, submit your details — including your current bank account for deposit — using the link below. Applications close this Friday. This is a one-time, limited-availability offer."',
+    type: 'phishing_grant',
+    source: 'inbox',
+    scheduledDay: 57,
+    emailMeta: {
+      sender: 'grants@national-housing-relief.org',
+      subject: 'Housing Assistance Grant – $2,800 — Apply Before Friday',
+      preview: 'Qualify for a $2,800 non-repayable housing grant. Limited availability.',
+      riskBadge: 'Scam',
+    },
+    realContext:
+      'Real housing assistance programs are administered by local governments and charities — they have public application processes and never solicit bank details by email.',
+    difficulty: 'medium',
+    targetRoles: ['student', 'employee', 'freelancer'],
+    choices: [
+      {
+        text: 'Ignore and report it — government grants don\'t arrive as unsolicited emails.',
+        qualityLevel: 'best',
+        feedback:
+          'Correct. Legitimate housing grants have public application portals. Unsolicited emails asking for bank details to "receive" a grant are always fraudulent.',
+        effects: { xp: 50, securityScore: 8, awarenessScore: 10, balance: 0 },
+        timeline: [
+          { day: 1, event: 'Email reported as phishing. No data exposed.', isPositive: true },
+          { day: 3, event: 'Anti-fraud authority notified. Domain flagged.', isPositive: true },
+          { day: 7, event: 'Awareness score rises. Two months of solid decisions.', isPositive: true },
+        ],
+      },
+      {
+        text: 'Submit your bank details — $2,800 would really help with rent.',
+        qualityLevel: 'worst',
+        feedback:
+          'Your bank account number and routing details were stolen. An unauthorized debit wiped a significant portion of your balance.',
+        effects: { xp: 0, securityScore: -28, awarenessScore: -10, balance: -1100 },
+        timeline: [
+          { day: 1, event: 'Bank account details submitted to scam site.', isPositive: false },
+          { day: 2, event: 'Unauthorized ACH debit of $1,100 processed overnight.', isPositive: false },
+          { day: 5, event: 'Bank account frozen pending investigation.', isPositive: false },
+          { day: 30, event: '$600 recovered after fraud dispute. $500 permanently lost.', isPositive: false },
+        ],
+      },
+      {
+        text: 'Search online for "National Housing Relief Fund" to verify it\'s real.',
+        qualityLevel: 'average',
+        feedback:
+          'Good first step. The search reveals no official government body by that name. You should also report the email to the consumer protection agency.',
+        effects: { xp: 25, securityScore: 4, awarenessScore: 6, balance: 0 },
+        timeline: [
+          { day: 1, event: 'No government body matches the name. Scam confirmed.', isPositive: true },
+          { day: 1, event: 'Email deleted. No financial loss.', isPositive: true },
         ],
       },
     ],
