@@ -1,5 +1,13 @@
 // FinQuest API client — maps backend responses to UI-expected shapes.
-const BASE_URL = "http://localhost:5020/api";
+const RAW_BASE_URL = (import.meta as any).env?.VITE_API_URL as string | undefined;
+const DEFAULT_BASE_URL = "http://localhost:5020";
+
+function normalizeApiBaseUrl(raw: string): string {
+  const trimmed = raw.replace(/\/+$/, "");
+  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+}
+
+const BASE_URL = normalizeApiBaseUrl(RAW_BASE_URL ?? DEFAULT_BASE_URL);
 
 // ── Envelope unwrapper ────────────────────────────────────────────────────────
 
